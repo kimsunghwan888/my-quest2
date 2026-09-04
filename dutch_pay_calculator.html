@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>같이 계산해요 | 더치페이 계산기</title>
+  <style>
+    :root {
+      --sky-50: #f5fbff;
+      --sky-100: #e9f7ff;
+      --sky-200: #ccecff;
+      --sky-300: #a9dcf5;
+      --sky-500: #5caed3;
+      --sky-700: #28637e;
+      --ink: #24414e;
+      --muted: #6e8996;
+      --white: #ffffff;
+      --line: #d9edf7;
+      --shadow: 0 22px 50px rgba(69, 139, 171, .14);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(255,255,255,.9) 0 9%, transparent 24%),
+        radial-gradient(circle at 92% 86%, rgba(204,236,255,.75) 0 10%, transparent 28%),
+        linear-gradient(145deg, #f8fdff 0%, #e8f7ff 48%, #dff2fb 100%);
+    }
+
+    .shell { width: min(1060px, calc(100% - 36px)); margin: 0 auto; padding: 42px 0 58px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 24px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 14px; background: var(--white); border: 1px solid var(--line); color: var(--sky-700); font-size: 21px; box-shadow: 0 8px 20px rgba(69,139,171,.1); }
+    .brand-name { font-weight: 800; letter-spacing: -.4px; }
+    .brand-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+    .status { padding: 8px 12px; border-radius: 999px; color: var(--sky-700); background: rgba(255,255,255,.68); border: 1px solid var(--line); font-size: 12px; font-weight: 700; }
+
+    .hero { margin-bottom: 26px; }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 52px); line-height: 1.13; letter-spacing: -2px; }
+    .hero p { margin: 12px 0 0; color: var(--muted); font-size: 16px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.03fr) minmax(320px, .97fr); gap: 20px; align-items: stretch; }
+    .panel { background: rgba(255,255,255,.84); border: 1px solid rgba(255,255,255,.98); border-radius: 24px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
+    .form-panel { padding: 28px; }
+    .result-panel { padding: 30px; background: linear-gradient(160deg, #d5effc, #effaff 75%); border-color: rgba(169,220,245,.72); display: flex; flex-direction: column; }
+    .panel-heading { display: flex; justify-content: space-between; gap: 16px; align-items: start; margin-bottom: 24px; }
+    h2 { margin: 0; font-size: 19px; letter-spacing: -.5px; }
+    .panel-caption { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .field { margin-bottom: 20px; }
+    label { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; font-weight: 800; font-size: 14px; }
+    .hint { color: var(--muted); font-weight: 500; font-size: 12px; }
+    .input-wrap { position: relative; }
+    input, select { width: 100%; border: 1px solid var(--line); border-radius: 13px; background: var(--sky-50); color: var(--ink); font: inherit; outline: none; transition: border-color .18s, box-shadow .18s, background .18s; }
+    input { padding: 14px 44px 14px 15px; font-size: 18px; font-weight: 700; }
+    select { padding: 13px 14px; font-size: 14px; }
+    input:focus, select:focus { border-color: var(--sky-500); background: var(--white); box-shadow: 0 0 0 4px rgba(92,174,211,.14); }
+    .unit { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 13px; font-weight: 700; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .tip-options { display: flex; gap: 8px; flex-wrap: wrap; }
+    .tip-button { flex: 1 0 50px; border: 1px solid var(--line); border-radius: 11px; background: var(--sky-50); color: var(--sky-700); padding: 10px 8px; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+    .tip-button.active, .tip-button:hover { background: var(--sky-200); border-color: var(--sky-300); }
+    .actions { display: flex; gap: 10px; margin-top: 26px; }
+    button { border: 0; font: inherit; cursor: pointer; }
+    .primary, .secondary { border-radius: 13px; padding: 13px 17px; font-weight: 800; }
+    .primary { flex: 1; background: var(--sky-700); color: white; box-shadow: 0 10px 18px rgba(40,99,126,.18); }
+    .primary:hover { background: #1f526a; }
+    .secondary { background: var(--sky-100); color: var(--sky-700); }
+    .secondary:hover { background: var(--sky-200); }
+    .result-kicker { color: var(--sky-700); font-size: 13px; font-weight: 800; }
+    .amount { margin: 10px 0 4px; font-size: clamp(38px, 6vw, 62px); line-height: 1.05; letter-spacing: -2px; color: #1e617e; word-break: break-all; }
+    .per-person { color: var(--muted); font-size: 13px; }
+    .result-divider { height: 1px; background: rgba(92,174,211,.25); margin: 28px 0 18px; }
+    .detail-list { display: grid; gap: 12px; }
+    .detail { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; }
+    .detail span:first-child { color: var(--muted); }
+    .detail strong { color: var(--ink); }
+    .copy-button { align-self: start; margin-top: auto; padding: 11px 14px; border-radius: 11px; color: var(--sky-700); background: rgba(255,255,255,.7); border: 1px solid rgba(92,174,211,.25); font-weight: 800; }
+    .copy-button:hover { background: white; }
+    .footer-note { margin-top: 18px; color: var(--muted); font-size: 12px; text-align: center; }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 24px, 600px); padding-top: 24px; }
+      .topbar { margin-bottom: 32px; }
+      .status { display: none; }
+      .layout { grid-template-columns: 1fr; }
+      .form-panel, .result-panel { padding: 22px; border-radius: 20px; }
+      .result-panel { min-height: 410px; }
+      .split { grid-template-columns: 1fr; gap: 0; }
+      h1 { letter-spacing: -1.5px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">÷</div>
+        <div><div class="brand-name">같이 계산해요</div><div class="brand-sub">빠르고 공평한 더치페이</div></div>
+      </div>
+      <div class="status">오늘도 깔끔하게</div>
+    </header>
+
+    <section class="hero">
+      <h1>함께 먹은 만큼,<br>가볍게 나눠요.</h1>
+      <p>총 금액과 인원만 입력하면 1인 금액을 바로 계산해 드려요.</p>
+    </section>
+
+    <section class="layout" aria-label="더치페이 계산기">
+      <form class="panel form-panel" id="calculatorForm">
+        <div class="panel-heading"><div><h2>계산 정보</h2><p class="panel-caption">금액을 입력하고 나눌 방법을 골라 주세요.</p></div></div>
+        <div class="field">
+          <label for="total">전체 금액 <span class="hint">영수증 총액</span></label>
+          <div class="input-wrap"><input id="total" type="number" min="0" step="100" value="60000" inputmode="numeric"><span class="unit">원</span></div>
+        </div>
+        <div class="split">
+          <div class="field">
+            <label for="people">인원수</label>
+            <div class="input-wrap"><input id="people" type="number" min="1" step="1" value="4" inputmode="numeric"><span class="unit">명</span></div>
+          </div>
+          <div class="field">
+            <label for="rounding">반올림 단위</label>
+            <select id="rounding"><option value="1">1원 단위</option><option value="10">10원 단위</option><option value="100" selected>100원 단위</option><option value="1000">1,000원 단위</option></select>
+          </div>
+        </div>
+        <div class="field">
+          <label>봉사료 <span class="hint">선택 사항</span></label>
+          <div class="tip-options" role="group" aria-label="봉사료 선택"><button type="button" class="tip-button" data-tip="0">없음</button><button type="button" class="tip-button" data-tip="5">5%</button><button type="button" class="tip-button active" data-tip="10">10%</button><button type="button" class="tip-button" data-tip="15">15%</button></div>
+        </div>
+        <div class="actions"><button class="primary" type="submit">계산하기</button><button class="secondary" type="button" id="resetButton">초기화</button></div>
+      </form>
+
+      <aside class="panel result-panel" aria-live="polite">
+        <div class="result-kicker">한 사람당 내야 할 금액</div>
+        <div class="amount" id="perPerson">16,500원</div>
+        <div class="per-person">반올림 후 기준 · 나머지는 마지막 사람이 부담</div>
+        <div class="result-divider"></div>
+        <div class="detail-list">
+          <div class="detail"><span>원래 금액</span><strong id="originalAmount">60,000원</strong></div>
+          <div class="detail"><span>봉사료 포함</span><strong id="tipAmount">6,000원</strong></div>
+          <div class="detail"><span>나눌 총액</span><strong id="grandTotal">66,000원</strong></div>
+          <div class="detail"><span>나머지 금액</span><strong id="remainder">0원</strong></div>
+        </div>
+        <button class="copy-button" type="button" id="copyButton">결과 복사하기</button>
+      </aside>
+    </section>
+    <p class="footer-note">반올림으로 생긴 차액은 마지막 사람이 부담하도록 계산합니다.</p>
+  </main>
+
+  <script>
+    const form = document.getElementById('calculatorForm');
+    const totalInput = document.getElementById('total');
+    const peopleInput = document.getElementById('people');
+    const roundingInput = document.getElementById('rounding');
+    const tipButtons = document.querySelectorAll('.tip-button');
+    let tipRate = 10;
+
+    const money = (value) => `${Math.round(value).toLocaleString('ko-KR')}원`;
+    const calculate = () => {
+      const total = Math.max(0, Number(totalInput.value) || 0);
+      const people = Math.max(1, Math.floor(Number(peopleInput.value) || 1));
+      const rounding = Number(roundingInput.value) || 1;
+      const tip = total * tipRate / 100;
+      const grandTotal = total + tip;
+      const exactShare = grandTotal / people;
+      const share = Math.ceil(exactShare / rounding) * rounding;
+      const remainder = (share * people) - grandTotal;
+
+      document.getElementById('perPerson').textContent = money(share);
+      document.getElementById('originalAmount').textContent = money(total);
+      document.getElementById('tipAmount').textContent = money(tip);
+      document.getElementById('grandTotal').textContent = money(grandTotal);
+      document.getElementById('remainder').textContent = money(remainder);
+    };
+
+    tipButtons.forEach((button) => button.addEventListener('click', () => {
+      tipButtons.forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      tipRate = Number(button.dataset.tip);
+      calculate();
+    }));
+    form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); });
+    [totalInput, peopleInput, roundingInput].forEach((input) => input.addEventListener('input', calculate));
+    document.getElementById('resetButton').addEventListener('click', () => {
+      totalInput.value = 0; peopleInput.value = 1; roundingInput.value = 100; tipRate = 0;
+      tipButtons.forEach((button) => button.classList.toggle('active', button.dataset.tip === '0'));
+      calculate();
+    });
+    document.getElementById('copyButton').addEventListener('click', async () => {
+      const text = `더치페이 결과\n1인 금액: ${document.getElementById('perPerson').textContent}\n나눌 총액: ${document.getElementById('grandTotal').textContent}`;
+      try { await navigator.clipboard.writeText(text); } catch (error) { return; }
+      const button = document.getElementById('copyButton');
+      const original = button.textContent; button.textContent = '복사했습니다';
+      setTimeout(() => { button.textContent = original; }, 1600);
+    });
+    calculate();
+  </script>
+</body>
+</html>

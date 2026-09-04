@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>세금 한눈에 계산 | 종합소득세 · 부가세 · 재산세</title>
+  <style>
+    :root { --sky-50:#f5fbff; --sky-100:#e5f6ff; --sky-200:#c9eafa; --sky-500:#57a9ce; --sky-700:#245f7b; --ink:#23434f; --muted:#708a95; --line:#d5ebf3; --coral:#ed987f; --white:#fff; --shadow:0 22px 52px rgba(64,135,165,.15); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--ink); font-family:"Malgun Gothic","맑은 고딕",sans-serif; background:radial-gradient(circle at 8% 9%,rgba(255,255,255,.94) 0 8%,transparent 23%),radial-gradient(circle at 94% 88%,rgba(192,229,247,.8) 0 10%,transparent 28%),linear-gradient(145deg,#fbfeff 0%,#eaf8ff 53%,#def2fb 100%); }
+    *:focus-visible { outline:3px solid rgba(237,152,127,.55); outline-offset:2px; }
+    button,input,select { font:inherit; } button { border:0; cursor:pointer; }
+    .shell { width:min(1100px,calc(100% - 36px)); margin:0 auto; padding:35px 0 52px; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:26px; }
+    .brand { display:flex; align-items:center; gap:12px; } .mark { display:grid; place-items:center; width:44px; height:44px; color:var(--sky-700); background:var(--white); border:1px solid var(--line); border-radius:14px; box-shadow:0 8px 20px rgba(69,139,171,.1); font-size:21px; font-weight:900; }
+    .brand-name { font-weight:900; letter-spacing:-.5px; } .brand-sub { margin-top:2px; color:var(--muted); font-size:12px; }
+    .badge { padding:8px 12px; color:var(--sky-700); background:rgba(255,255,255,.72); border:1px solid var(--line); border-radius:999px; font-size:12px; font-weight:800; }
+    h1 { margin:0; font-size:clamp(30px,5vw,52px); line-height:1.12; letter-spacing:-2px; } .intro { margin:11px 0 26px; color:var(--muted); font-size:16px; }
+    .tabs { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:19px; } .tab { padding:14px 10px; color:var(--sky-700); background:rgba(255,255,255,.7); border:1px solid var(--line); border-radius:13px; font-weight:900; } .tab.active,.tab:hover { background:var(--sky-200); border-color:var(--sky-500); }
+    .panel { background:rgba(255,255,255,.88); border:1px solid rgba(255,255,255,.98); border-radius:22px; box-shadow:var(--shadow); backdrop-filter:blur(10px); } .calculator { display:grid; grid-template-columns:minmax(300px,.9fr) minmax(360px,1.1fr); gap:20px; align-items:stretch; }
+    .form-panel { padding:26px; } .result-panel { padding:30px; background:linear-gradient(160deg,#d6effb,#f0faff 78%); border-color:rgba(159,214,240,.72); }
+    .heading { margin-bottom:20px; } h2 { margin:0; font-size:19px; letter-spacing:-.5px; } .caption { margin:6px 0 0; color:var(--muted); font-size:13px; }
+    .field { margin-bottom:18px; } label { display:flex; justify-content:space-between; gap:10px; margin-bottom:8px; font-size:14px; font-weight:900; } .hint { color:var(--muted); font-size:11px; font-weight:500; }
+    .input-wrap { position:relative; } input,select { width:100%; color:var(--ink); background:var(--sky-50); border:1px solid var(--line); border-radius:12px; outline:none; } input { padding:13px 43px 13px 15px; font-size:19px; font-weight:800; } select { padding:13px 14px; font-size:14px; } input:focus,select:focus { border-color:var(--sky-500); background:var(--white); box-shadow:0 0 0 4px rgba(87,169,206,.14); } .unit { position:absolute; top:50%; right:15px; transform:translateY(-50%); color:var(--muted); font-size:13px; font-weight:800; }
+    .actions { display:flex; gap:9px; margin-top:24px; } .primary,.secondary { padding:13px 16px; border-radius:12px; font-weight:900; } .primary { flex:1; color:white; background:var(--sky-700); box-shadow:0 10px 18px rgba(36,95,123,.18); } .primary:hover { background:#1a4e67; } .secondary { color:var(--sky-700); background:var(--sky-100); } .secondary:hover { background:var(--sky-200); }
+    .result-kicker { color:var(--sky-700); font-size:13px; font-weight:900; } .main-value { margin:10px 0 4px; color:#1e617e; font-size:clamp(37px,6vw,60px); line-height:1.06; letter-spacing:-2px; word-break:break-all; } .result-note { color:var(--muted); font-size:13px; } .divider { height:1px; margin:28px 0 18px; background:rgba(87,169,206,.27); }
+    .details { display:grid; gap:13px; } .detail { display:flex; justify-content:space-between; gap:16px; font-size:14px; } .detail span { color:var(--muted); } .detail strong { color:var(--ink); }
+    .notice { display:flex; gap:9px; align-items:start; margin-top:27px; padding:13px 14px; color:var(--sky-700); background:rgba(255,255,255,.62); border:1px solid rgba(87,169,206,.24); border-radius:12px; font-size:12px; line-height:1.6; } .notice-mark { color:var(--coral); font-size:17px; font-weight:900; }
+    .foot { margin-top:17px; color:var(--muted); font-size:12px; text-align:center; }
+    @media (max-width:760px) { .shell { width:min(100% - 24px,600px); padding-top:23px; } .badge { display:none; } .tabs { grid-template-columns:1fr; } .calculator { grid-template-columns:1fr; } .form-panel,.result-panel { padding:21px; border-radius:18px; } .result-panel { order:-1; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar"><div class="brand"><div class="mark" aria-hidden="true">₩</div><div><div class="brand-name">세금 한눈에 계산</div><div class="brand-sub">종합소득세 · 부가세 · 재산세</div></div></div><div class="badge">Quest 4 · 세금 도우미</div></header>
+    <h1>복잡한 세금도<br>차근차근 계산해요.</h1>
+    <p class="intro">계산할 세금을 고르고 금액을 입력하면 예상 결과를 보여드려요.</p>
+    <nav class="tabs" role="tablist" aria-label="세금 종류 선택"><button class="tab active" type="button" data-tax="income">종합소득세</button><button class="tab" type="button" data-tax="vat">부가세</button><button class="tab" type="button" data-tax="property">재산세</button></nav>
+
+    <section class="calculator" aria-label="세금 계산기">
+      <form class="panel form-panel" id="taxForm"></form>
+      <aside class="panel result-panel" aria-live="polite"><div class="result-kicker" id="resultKicker">예상 종합소득세</div><div class="main-value" id="mainValue">0원</div><div class="result-note" id="resultNote">입력한 소득을 기준으로 계산한 예상 세액입니다.</div><div class="divider"></div><div class="details" id="details"></div><div class="notice"><span class="notice-mark">i</span><span>참고용 간이 계산기입니다. 실제 세금은 공제, 감면, 보유 조건과 신고 기준에 따라 달라질 수 있습니다.</span></div></aside>
+    </section>
+    <p class="foot">금액은 원 단위로 계산하며 소수점은 가장 가까운 원으로 반올림합니다.</p>
+  </main>
+  <script>
+    const form = document.getElementById('taxForm');
+    const tabs = document.querySelectorAll('.tab');
+    let selectedTax = 'income';
+    const money = (value) => `${Math.round(value).toLocaleString('ko-KR')}원`;
+    const input = (id, label, hint, value) => `<div class="field"><label for="${id}">${label} <span class="hint">${hint}</span></label><div class="input-wrap"><input id="${id}" type="number" min="0" step="1" value="${value}" inputmode="numeric"><span class="unit">원</span></div></div>`;
+    const select = (id, label, hint, options) => `<div class="field"><label for="${id}">${label} <span class="hint">${hint}</span></label><select id="${id}">${options}</select></div>`;
+    function renderForm() {
+      if (selectedTax === 'income') form.innerHTML = `<div class="heading"><h2>종합소득세 계산</h2><p class="caption">연간 소득과 공제액을 입력하세요.</p></div>${input('income','연간 종합소득','사업·근로·기타 소득 합계',50000000)}${input('deduction','소득공제액','인적공제 등',15000000)}<div class="actions"><button class="primary" id="calculateButton" type="button">계산하기</button><button class="secondary" type="reset">초기화</button></div>`;
+      if (selectedTax === 'vat') form.innerHTML = `<div class="heading"><h2>부가세 계산</h2><p class="caption">알고 있는 금액에 맞는 방법을 선택하세요.</p></div><div class="field"><label>계산 기준</label><select id="vatMode"><option value="supply">공급가액 기준</option><option value="total">합계금액 기준</option></select></div>${input('vatAmount','공급가액','세금 전 금액',100000)}${select('vatRate','부가세율','일반 과세 기준','<option value="10" selected>10%</option><option value="0">0% (면세 등)</option>')}<div class="actions"><button class="primary" id="calculateButton" type="button">계산하기</button><button class="secondary" type="reset">초기화</button></div>`;
+      if (selectedTax === 'property') form.innerHTML = `<div class="heading"><h2>재산세 계산</h2><p class="caption">주택 공시가격을 입력하세요.</p></div>${input('officialPrice','주택 공시가격','공시지가가 아닌 공시가격',300000000)}${select('propertyRate','재산세율','주택 간이 기준','<option value="0.001">0.1% (6천만원 이하)</option><option value="0.0015">0.15% (6천만원 초과)</option><option value="0.0025">0.25% (1억5천만원 초과)</option><option value="0.004">0.4% (3억원 초과)</option>')}<div class="actions"><button class="primary" id="calculateButton" type="button">계산하기</button><button class="secondary" type="reset">초기화</button></div>`;
+      form.querySelector('#calculateButton').addEventListener('click', calculate);
+      form.addEventListener('reset', () => setTimeout(calculate, 0));
+      form.querySelectorAll('input,select').forEach((element) => element.addEventListener('input', calculate));
+      calculate();
+    }
+    function detail(label, value) { return `<div class="detail"><span>${label}</span><strong>${money(value)}</strong></div>`; }
+    function calculate() {
+      let main = 0; let rows = ''; let note = ''; let kicker = '';
+      if (selectedTax === 'income') {
+        const income = Math.max(0, Number(document.getElementById('income').value) || 0); const deduction = Math.max(0, Number(document.getElementById('deduction').value) || 0); const taxable = Math.max(0, income - deduction);
+        const brackets = [[14000000,.06],[50000000,.15],[88000000,.24],[150000000,.35],[300000000,.38],[500000000,.40],[1000000000,.42],[Infinity,.45]]; let previous=0; let national=0;
+        for (const [limit, rate] of brackets) { national += Math.max(0, Math.min(taxable, limit) - previous) * rate; previous=limit; if (taxable <= limit) break; }
+        const local = national * .1; main = national + local; kicker='예상 종합소득세'; note='국세와 지방소득세를 합산한 예상 금액입니다.'; rows=detail('과세표준',taxable)+detail('국세',national)+detail('지방소득세',local);
+      } else if (selectedTax === 'vat') {
+        const amount = Math.max(0, Number(document.getElementById('vatAmount').value) || 0); const rate = (Number(document.getElementById('vatRate').value) || 0) / 100; const totalMode = document.getElementById('vatMode').value === 'total'; const supply = totalMode ? amount / (1 + rate) : amount; const tax = supply * rate; const total = totalMode ? amount : supply + tax; main=tax; kicker='예상 부가세'; note='입력한 금액에 적용한 부가가치세입니다.'; rows=detail('공급가액',supply)+detail('부가세',tax)+detail('합계금액',total);
+        const vatLabel = document.querySelector('label[for="vatAmount"]');
+        vatLabel.childNodes[0].textContent = totalMode ? '합계금액 ' : '공급가액 ';
+        vatLabel.querySelector('.hint').textContent = totalMode ? '세금 포함 금액' : '세금 전 금액';
+      } else {
+        const price = Math.max(0, Number(document.getElementById('officialPrice').value) || 0); const rate = Number(document.getElementById('propertyRate').value) || 0; const taxable = price * .6; main=taxable * rate; kicker='예상 재산세'; note='공시가격의 60%를 과세표준으로 본 간이 계산입니다.'; rows=detail('과세표준 (공시가격의 60%)',taxable)+detail('적용 세율',main);
+      }
+      document.getElementById('resultKicker').textContent=kicker; document.getElementById('mainValue').textContent=money(main); document.getElementById('resultNote').textContent=note; document.getElementById('details').innerHTML=rows;
+    }
+    tabs.forEach((tab) => tab.addEventListener('click', () => { selectedTax=tab.dataset.tax; tabs.forEach((item) => item.classList.toggle('active',item===tab)); renderForm(); }));
+    renderForm();
+  </script>
+</body>
+</html>

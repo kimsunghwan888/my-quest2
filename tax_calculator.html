@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>알기 쉬운 세금계산기 | 부가가치세</title>
+  <style>
+    :root {
+      --mint-50: #f4fcfa;
+      --mint-100: #e3f6f1;
+      --mint-200: #c6ece3;
+      --mint-500: #55b6a4;
+      --mint-700: #22766c;
+      --ink: #213f42;
+      --muted: #6d8889;
+      --line: #d5ebe7;
+      --coral: #ec987d;
+      --white: #fff;
+      --shadow: 0 22px 52px rgba(64, 135, 137, .14);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Malgun Gothic", "맑은 고딕", sans-serif;
+      background:
+        radial-gradient(circle at 8% 8%, rgba(255,255,255,.94) 0 8%, transparent 23%),
+        radial-gradient(circle at 94% 90%, rgba(197,235,227,.78) 0 10%, transparent 27%),
+        linear-gradient(145deg, #fbfffe 0%, #eaf9f5 54%, #ddf3ee 100%);
+    }
+
+    *:focus-visible { outline: 3px solid rgba(236,152,125,.55); outline-offset: 2px; }
+    button, input, select { font: inherit; }
+    button { border: 0; cursor: pointer; }
+    .shell { width: min(1050px, calc(100% - 36px)); margin: 0 auto; padding: 36px 0 54px; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 26px; }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { display: grid; place-items: center; width: 44px; height: 44px; color: var(--mint-700); background: var(--white); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 8px 20px rgba(69,139,140,.1); font-size: 21px; font-weight: 900; }
+    .brand-name { font-weight: 900; letter-spacing: -.5px; }
+    .brand-sub { margin-top: 2px; color: var(--muted); font-size: 12px; }
+    .badge { padding: 8px 12px; color: var(--mint-700); background: rgba(255,255,255,.7); border: 1px solid var(--line); border-radius: 999px; font-size: 12px; font-weight: 800; }
+    h1 { margin: 0; font-size: clamp(30px, 5vw, 52px); line-height: 1.12; letter-spacing: -2px; }
+    .intro { margin: 11px 0 27px; color: var(--muted); font-size: 16px; }
+    .layout { display: grid; grid-template-columns: minmax(300px, .9fr) minmax(360px, 1.1fr); gap: 20px; align-items: stretch; }
+    .panel { background: rgba(255,255,255,.88); border: 1px solid rgba(255,255,255,.98); border-radius: 22px; box-shadow: var(--shadow); backdrop-filter: blur(10px); }
+    .form-panel { padding: 26px; }
+    .result-panel { padding: 30px; background: linear-gradient(160deg, #d7f2eb, #f1fcfa 78%); border-color: rgba(150,214,202,.72); }
+    .heading { margin-bottom: 21px; }
+    h2 { margin: 0; font-size: 19px; letter-spacing: -.5px; }
+    .caption { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+    .mode-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+    .mode-button { padding: 12px 10px; color: var(--mint-700); background: var(--mint-50); border: 1px solid var(--line); border-radius: 12px; font-size: 13px; font-weight: 800; }
+    .mode-button.active, .mode-button:hover { color: var(--mint-700); background: var(--mint-200); border-color: var(--mint-500); }
+    .field { margin-bottom: 19px; }
+    label { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; font-size: 14px; font-weight: 900; }
+    .hint { color: var(--muted); font-size: 11px; font-weight: 500; }
+    .input-wrap { position: relative; }
+    input, select { width: 100%; color: var(--ink); background: var(--mint-50); border: 1px solid var(--line); border-radius: 12px; outline: none; }
+    input { padding: 14px 43px 14px 15px; font-size: 20px; font-weight: 800; }
+    select { padding: 13px 14px; font-size: 14px; }
+    input:focus, select:focus { border-color: var(--mint-500); background: var(--white); box-shadow: 0 0 0 4px rgba(85,182,164,.14); }
+    .unit { position: absolute; top: 50%; right: 15px; transform: translateY(-50%); color: var(--muted); font-size: 13px; font-weight: 800; }
+    .actions { display: flex; gap: 9px; margin-top: 25px; }
+    .primary, .secondary { padding: 13px 16px; border-radius: 12px; font-weight: 900; }
+    .primary { flex: 1; color: var(--white); background: var(--mint-700); box-shadow: 0 10px 18px rgba(34,118,108,.18); }
+    .primary:hover { background: #185f57; }
+    .secondary { color: var(--mint-700); background: var(--mint-100); }
+    .secondary:hover { background: var(--mint-200); }
+    .result-kicker { color: var(--mint-700); font-size: 13px; font-weight: 900; }
+    .total { margin: 10px 0 4px; color: #1e7066; font-size: clamp(38px, 6vw, 62px); line-height: 1.06; letter-spacing: -2px; word-break: break-all; }
+    .result-note { color: var(--muted); font-size: 13px; }
+    .divider { height: 1px; margin: 29px 0 18px; background: rgba(85,182,164,.27); }
+    .details { display: grid; gap: 13px; }
+    .detail { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; }
+    .detail span { color: var(--muted); }
+    .detail strong { color: var(--ink); }
+    .tip { display: flex; gap: 9px; align-items: start; margin-top: 28px; padding: 13px 14px; color: var(--mint-700); background: rgba(255,255,255,.6); border: 1px solid rgba(85,182,164,.22); border-radius: 12px; font-size: 12px; line-height: 1.6; }
+    .tip-mark { color: var(--coral); font-size: 17px; font-weight: 900; }
+    .footer { margin-top: 17px; color: var(--muted); font-size: 12px; text-align: center; }
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 24px, 600px); padding-top: 23px; }
+      .badge { display: none; }
+      .layout { grid-template-columns: 1fr; }
+      .form-panel, .result-panel { padding: 21px; border-radius: 18px; }
+      .result-panel { order: -1; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">%</div><div><div class="brand-name">알기 쉬운 세금계산기</div><div class="brand-sub">부가가치세를 간단하게</div></div></div>
+      <div class="badge">Quest 4 · 세금계산기</div>
+    </header>
+
+    <h1>세금, 어렵지 않게<br>바로 계산해요.</h1>
+    <p class="intro">금액을 입력하면 공급가액과 부가세를 한눈에 확인할 수 있어요.</p>
+
+    <section class="layout" aria-label="부가가치세 계산기">
+      <form class="panel form-panel" id="taxForm">
+        <div class="heading"><h2>계산 방법</h2><p class="caption">알고 있는 금액에 맞는 방법을 선택하세요.</p></div>
+        <div class="mode-options" role="group" aria-label="계산 방법 선택"><button class="mode-button active" type="button" data-mode="supply">공급가액 기준</button><button class="mode-button" type="button" data-mode="total">합계금액 기준</button></div>
+        <div class="field"><label for="amount" id="amountLabel">공급가액 <span class="hint">세금 전 금액</span></label><div class="input-wrap"><input id="amount" type="number" min="0" step="100" value="100000" inputmode="numeric"><span class="unit">원</span></div></div>
+        <div class="field"><label for="taxRate">부가세율 <span class="hint">일반 과세 기준</span></label><select id="taxRate"><option value="10" selected>10%</option><option value="0">0% (면세 등)</option></select></div>
+        <div class="actions"><button class="primary" type="submit">계산하기</button><button class="secondary" type="reset">초기화</button></div>
+      </form>
+
+      <aside class="panel result-panel" aria-live="polite">
+        <div class="result-kicker" id="mainResultLabel">결제할 합계금액</div>
+        <div class="total" id="grandTotal">110,000원</div>
+        <div class="result-note">입력한 금액을 기준으로 계산한 결과예요.</div>
+        <div class="divider"></div>
+        <div class="details"><div class="detail"><span>공급가액</span><strong id="supplyAmount">100,000원</strong></div><div class="detail"><span>부가세</span><strong id="taxAmount">10,000원</strong></div><div class="detail"><span>합계금액</span><strong id="totalAmount">110,000원</strong></div></div>
+        <div class="tip"><span class="tip-mark">i</span><span>이 계산기는 일반적인 부가가치세 계산을 돕는 참고용 도구입니다. 실제 신고·납부 금액은 거래 조건과 세법에 따라 달라질 수 있습니다.</span></div>
+      </aside>
+    </section>
+    <p class="footer">금액은 원 단위로 계산하며 소수점은 가장 가까운 원으로 반올림합니다.</p>
+  </main>
+
+  <script>
+    const form = document.getElementById('taxForm');
+    const amountInput = document.getElementById('amount');
+    const taxRateInput = document.getElementById('taxRate');
+    const modeButtons = document.querySelectorAll('.mode-button');
+    let mode = 'supply';
+
+    const money = (value) => `${Math.round(value).toLocaleString('ko-KR')}원`;
+    const calculate = () => {
+      const amount = Math.max(0, Number(amountInput.value) || 0);
+      const rate = Math.max(0, Number(taxRateInput.value) || 0) / 100;
+      const supply = mode === 'supply' ? amount : amount / (1 + rate);
+      const tax = supply * rate;
+      const total = mode === 'supply' ? supply + tax : amount;
+      document.getElementById('grandTotal').textContent = money(total);
+      document.getElementById('supplyAmount').textContent = money(supply);
+      document.getElementById('taxAmount').textContent = money(tax);
+      document.getElementById('totalAmount').textContent = money(total);
+    };
+
+    modeButtons.forEach((button) => button.addEventListener('click', () => {
+      mode = button.dataset.mode;
+      modeButtons.forEach((item) => item.classList.toggle('active', item === button));
+      document.getElementById('amountLabel').childNodes[0].textContent = mode === 'supply' ? '공급가액 ' : '합계금액 ';
+      document.querySelector('#amountLabel .hint').textContent = mode === 'supply' ? '세금 전 금액' : '세금 포함 금액';
+      document.getElementById('mainResultLabel').textContent = mode === 'supply' ? '결제할 합계금액' : '계산된 공급가액';
+      calculate();
+    }));
+    form.addEventListener('submit', (event) => { event.preventDefault(); calculate(); });
+    [amountInput, taxRateInput].forEach((input) => input.addEventListener('input', calculate));
+    form.addEventListener('reset', () => { setTimeout(() => { mode = 'supply'; modeButtons.forEach((button, index) => button.classList.toggle('active', index === 0)); document.getElementById('amountLabel').childNodes[0].textContent = '공급가액 '; document.querySelector('#amountLabel .hint').textContent = '세금 전 금액'; document.getElementById('mainResultLabel').textContent = '결제할 합계금액'; calculate(); }, 0); });
+    calculate();
+  </script>
+</body>
+</html>
