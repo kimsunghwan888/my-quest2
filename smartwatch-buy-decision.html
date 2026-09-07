@@ -1,0 +1,661 @@
+<title>건강 스마트워치 구매 판정서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Gowun+Batang:wght@400;700&display=swap">
+
+<style>
+/* ── 토큰: 라이트가 기준. 다크는 토큰만 재정의 ───────────────── */
+:root{
+  --ground:#F4F6F6;
+  --surface:#FFFFFF;
+  --surface-2:#EDF1F0;
+  --ink:#12201E;
+  --ink-2:#41544F;
+  --ink-3:#6E817C;
+  --line:#DCE3E1;
+  --line-strong:#C3CFCC;
+
+  --accent:#0E8F80;          /* 검증됨: light surface #F4F6F6 */
+  --accent-soft:#DCEFEC;
+  --accent-ink:#0A6F63;
+
+  --caution:#B45309;         /* status: 주의 (아이콘·라벨 동반) */
+  --caution-soft:#F7EBDC;
+  --danger:#A61A6E;
+  --danger-soft:#F6E4EF;
+
+  --bar-muted:#C7D3D0;
+
+  --shadow:0 1px 2px rgba(18,32,30,.05), 0 8px 24px -16px rgba(18,32,30,.28);
+
+  --f-sans:"IBM Plex Sans KR", -apple-system, "Malgun Gothic", sans-serif;
+  --f-serif:"Gowun Batang", "Batang", serif;
+  --f-mono:"IBM Plex Mono", "D2Coding", monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#131A19;
+    --surface:#1B2422;
+    --surface-2:#222D2B;
+    --ink:#E6EDEB;
+    --ink-2:#AFC0BC;
+    --ink-3:#849490;
+    --line:#2C3936;
+    --line-strong:#3C4C48;
+    --accent:#2AA898;        /* 검증됨: dark surface #131A19 */
+    --accent-soft:#17322E;
+    --accent-ink:#5FD0BF;
+    --caution:#E0A054;
+    --caution-soft:#332616;
+    --danger:#DB6FA5;
+    --danger-soft:#33192A;
+    --bar-muted:#3C4C48;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#131A19; --surface:#1B2422; --surface-2:#222D2B;
+  --ink:#E6EDEB; --ink-2:#AFC0BC; --ink-3:#849490;
+  --line:#2C3936; --line-strong:#3C4C48;
+  --accent:#2AA898; --accent-soft:#17322E; --accent-ink:#5FD0BF;
+  --caution:#E0A054; --caution-soft:#332616;
+  --danger:#DB6FA5; --danger-soft:#33192A;
+  --bar-muted:#3C4C48;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--f-sans);
+  font-size:17px;
+  line-height:1.75;
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:980px;margin:0 auto;padding:0 24px 96px}
+
+/* ── 헤더 ───────────────────────────────────────────────── */
+.masthead{
+  border-bottom:2px solid var(--ink);
+  padding:44px 0 20px;
+  display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;justify-content:space-between;
+}
+.eyebrow{
+  font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--accent-ink);font-weight:600;margin:0 0 10px;
+}
+h1{
+  font-size:clamp(30px,4.6vw,46px);line-height:1.18;margin:0;font-weight:700;
+  letter-spacing:-.02em;text-wrap:balance;
+}
+.masthead .sub{margin:10px 0 0;color:var(--ink-2);font-size:16px;max-width:52ch}
+.stamp{
+  font-family:var(--f-mono);font-size:12.5px;line-height:1.9;color:var(--ink-3);
+  text-align:right;white-space:nowrap;
+}
+.stamp b{color:var(--ink-2);font-weight:500}
+
+/* ── 심전도 구분선 (주제 모티프) ─────────────────────────── */
+.ecg{display:block;width:100%;height:26px;margin:56px 0 40px;color:var(--line-strong)}
+.ecg path{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.ecg .beat{stroke:var(--accent);stroke-width:2}
+
+/* ── 판정 블록 ──────────────────────────────────────────── */
+.verdict{
+  background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);
+  border-radius:3px;padding:32px 34px;margin-top:40px;box-shadow:var(--shadow);
+}
+.verdict-top{display:flex;flex-wrap:wrap;align-items:baseline;gap:14px;margin-bottom:6px}
+.verdict-label{font-family:var(--f-mono);font-size:12px;letter-spacing:.14em;color:var(--ink-3);text-transform:uppercase}
+.verdict-call{font-size:clamp(28px,4vw,38px);font-weight:700;letter-spacing:-.02em;color:var(--accent-ink);line-height:1.25}
+.verdict p{margin:12px 0 0;font-size:18px;color:var(--ink-2);max-width:62ch}
+.verdict p strong{color:var(--ink);font-weight:600}
+
+.why{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+.why li{background:var(--surface);padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+.why .n{
+  font-family:var(--f-mono);font-size:12px;font-weight:600;color:var(--accent-ink);
+  background:var(--accent-soft);border-radius:2px;padding:2px 7px;flex:none;margin-top:3px;
+}
+.why .t{font-size:16px;color:var(--ink-2)}
+.why .t b{color:var(--ink);font-weight:600}
+
+/* ── 섹션 ───────────────────────────────────────────────── */
+section{margin-top:60px}
+h2{
+  font-size:25px;font-weight:700;letter-spacing:-.015em;margin:0 0 6px;
+  display:flex;align-items:baseline;gap:12px;
+}
+h2 .num{font-family:var(--f-mono);font-size:14px;color:var(--accent-ink);font-weight:600}
+.lede{margin:0 0 26px;color:var(--ink-2);font-size:16.5px;max-width:66ch}
+h3{font-size:18px;font-weight:600;margin:34px 0 12px;letter-spacing:-.01em}
+
+/* ── 분기(결정 흐름) ────────────────────────────────────── */
+.branches{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.branch{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:22px;display:flex;flex-direction:column}
+.branch.pick{border-color:var(--accent);border-width:2px;padding:21px}
+.branch .cond{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase;margin-bottom:8px}
+.branch .ans{font-size:20px;font-weight:700;line-height:1.35;margin-bottom:8px}
+.branch.pick .ans{color:var(--accent-ink)}
+.branch .note{font-size:15px;color:var(--ink-2);margin:0}
+.branch .price{margin-top:auto;padding-top:14px;font-family:var(--f-mono);font-size:15px;font-weight:500;color:var(--ink)}
+.branch .price span{font-size:12px;color:var(--ink-3);font-weight:400}
+
+/* ── 표 ─────────────────────────────────────────────────── */
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:3px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px;font-size:15.5px}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line)}
+thead th{
+  background:var(--surface-2);font-size:12.5px;font-weight:600;letter-spacing:.06em;
+  color:var(--ink-2);text-transform:uppercase;white-space:nowrap;
+}
+td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tbody tr.hi td{background:var(--accent-soft)}
+tbody tr.hi td:first-child{font-weight:600}
+.tag{
+  display:inline-block;font-size:11.5px;font-family:var(--f-mono);letter-spacing:.04em;
+  padding:1px 7px;border-radius:2px;vertical-align:2px;margin-left:6px;
+}
+.tag.rec{background:var(--accent-soft);color:var(--accent-ink)}
+.tag.warn{background:var(--caution-soft);color:var(--caution)}
+.caption{font-size:13.5px;color:var(--ink-3);margin:10px 0 0}
+
+/* ── 막대 차트 ──────────────────────────────────────────── */
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:24px 26px;margin-top:18px}
+.chart-h{font-size:15px;font-weight:600;margin:0 0 4px}
+.chart-s{font-size:13.5px;color:var(--ink-3);margin:0 0 20px}
+.bars{display:grid;gap:11px}
+.bar-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr auto;gap:14px;align-items:center;cursor:default}
+.bar-row .lbl{font-size:14.5px;color:var(--ink-2);line-height:1.35;text-align:right}
+.bar-row.on .lbl{color:var(--ink);font-weight:600}
+.track{background:var(--surface-2);height:16px;border-radius:2px;position:relative;overflow:hidden}
+.fill{height:100%;background:var(--bar-muted);border-radius:0 4px 4px 0;transition:filter .15s ease}
+.bar-row.on .fill{background:var(--accent)}
+.bar-row:hover .fill{filter:brightness(1.08) saturate(1.1)}
+.val{font-family:var(--f-mono);font-size:14px;font-variant-numeric:tabular-nums;color:var(--ink-2);min-width:74px;text-align:right}
+.bar-row.on .val{color:var(--ink);font-weight:600}
+.axis{
+  display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:11.5px;
+  color:var(--ink-3);margin-top:14px;padding-top:8px;border-top:1px solid var(--line);
+}
+.axis .a-pad{width:190px;flex:none}
+.axis .a-scale{flex:1;display:flex;justify-content:space-between}
+
+/* 별점 분포 */
+.dist{display:grid;gap:8px;margin-top:6px}
+.dist-row{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center}
+.dist-row .s{font-family:var(--f-mono);font-size:13.5px;color:var(--ink-2)}
+.dist-row .t{background:var(--surface-2);height:22px;border-radius:2px;overflow:hidden}
+.dist-row .f{height:100%;background:var(--accent);border-radius:0 4px 4px 0}
+.dist-row.low .f{background:var(--caution)}
+.dist-row .v{font-family:var(--f-mono);font-size:13px;color:var(--ink-2);min-width:112px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* 히어로 숫자 */
+.figs{display:grid;gap:1px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));background:var(--line);border:1px solid var(--line);margin-top:22px}
+.fig{background:var(--surface);padding:20px 18px}
+.fig .n{font-family:var(--f-mono);font-size:30px;font-weight:600;letter-spacing:-.02em;line-height:1.1;color:var(--accent-ink)}
+.fig .n small{font-size:15px;font-weight:400;color:var(--ink-3);margin-left:2px}
+.fig .c{font-size:13.5px;color:var(--ink-3);margin-top:6px;line-height:1.45}
+
+/* ── 인용 (사람 목소리 = 명조) ──────────────────────────── */
+.quotes{display:grid;gap:14px;margin-top:16px}
+.q{
+  background:var(--surface);border:1px solid var(--line);border-radius:3px;
+  padding:20px 22px;border-left:3px solid var(--line-strong);
+}
+.q.pos{border-left-color:var(--accent)}
+.q.neg{border-left-color:var(--caution)}
+.q blockquote{
+  margin:0;font-family:var(--f-serif);font-size:17.5px;line-height:1.72;color:var(--ink);
+}
+.q .src{
+  margin-top:12px;font-family:var(--f-mono);font-size:12px;color:var(--ink-3);
+  display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+}
+.q .src .dot{width:3px;height:3px;border-radius:50%;background:var(--line-strong)}
+
+/* ── 광고 판별 ──────────────────────────────────────────── */
+.filterbox{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));margin-top:18px}
+.fbox{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:22px}
+.fbox h4{margin:0 0 12px;font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.fbox h4 .icon{
+  font-family:var(--f-mono);font-size:11px;font-weight:700;width:20px;height:20px;border-radius:2px;
+  display:grid;place-items:center;flex:none;
+}
+.fbox.out h4 .icon{background:var(--caution-soft);color:var(--caution)}
+.fbox.in h4 .icon{background:var(--accent-soft);color:var(--accent-ink)}
+.fbox ul{margin:0;padding-left:0;list-style:none;display:grid;gap:9px}
+.fbox li{font-size:15px;color:var(--ink-2);padding-left:16px;position:relative;line-height:1.6}
+.fbox li::before{content:"";position:absolute;left:0;top:11px;width:6px;height:1.5px;background:var(--line-strong)}
+.fbox code{
+  font-family:var(--f-mono);font-size:13px;background:var(--surface-2);
+  padding:1px 5px;border-radius:2px;color:var(--ink);
+}
+
+/* ── 저울 (살 이유 / 말 이유) ───────────────────────────── */
+.scale{display:grid;gap:14px;grid-template-columns:1fr 1fr;margin-top:18px}
+@media (max-width:720px){.scale{grid-template-columns:1fr}}
+.pan{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:22px}
+.pan.up{border-top:3px solid var(--accent)}
+.pan.down{border-top:3px solid var(--caution)}
+.pan h4{margin:0 0 4px;font-size:16px;font-weight:700}
+.pan .score{font-family:var(--f-mono);font-size:12.5px;color:var(--ink-3);margin-bottom:14px}
+.pan ol{margin:0;padding-left:20px;display:grid;gap:11px}
+.pan li{font-size:15.5px;color:var(--ink-2);line-height:1.62}
+.pan li b{color:var(--ink);font-weight:600}
+
+/* ── 체크리스트 ─────────────────────────────────────────── */
+.checks{list-style:none;padding:0;margin:18px 0 0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+.checks li{background:var(--surface);padding:15px 18px;display:flex;gap:14px;align-items:flex-start;font-size:16px;color:var(--ink-2)}
+.checks .box{
+  width:19px;height:19px;border:1.5px solid var(--line-strong);border-radius:2px;flex:none;margin-top:3px;
+}
+.checks li b{color:var(--ink);font-weight:600}
+
+/* ── 방법론 ─────────────────────────────────────────────── */
+.method{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:3px;
+  padding:24px 26px;margin-top:22px;font-size:14.5px;color:var(--ink-2);line-height:1.7;
+}
+.method h4{margin:0 0 10px;font-size:14px;font-weight:600;color:var(--ink);letter-spacing:.02em}
+.method p{margin:0 0 12px}
+.method p:last-child{margin-bottom:0}
+.method .mono{font-family:var(--f-mono);font-size:13px;color:var(--ink)}
+
+footer{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink-3)}
+footer p{margin:0 0 6px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:640px){
+  body{font-size:16px}
+  .bar-row{grid-template-columns:minmax(96px,132px) 1fr auto;gap:10px}
+  .axis .a-pad{width:132px}
+  .verdict{padding:24px 22px}
+}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <p class="eyebrow">구매 결정 리포트 · 퀘스트 2</p>
+      <h1>건강측정용 스마트워치,<br>살까 말까</h1>
+      <p class="sub">네이버 카페의 진짜 사용 후기와 쿠팡의 가격·별점·리뷰 수를 맞대어 본 판정서입니다.</p>
+    </div>
+    <div class="stamp">
+      조사일 <b>2026. 09. 07</b><br>
+      카페 글 <b>14건</b> (광고 7건 제외)<br>
+      쿠팡 상품 <b>13종</b> · 리뷰 <b>30,679개</b>
+    </div>
+  </header>
+
+  <!-- 판정 -->
+  <div class="verdict">
+    <div class="verdict-top">
+      <span class="verdict-label">판정</span>
+      <span class="verdict-call">조건부로 삽니다</span>
+    </div>
+    <p><strong>쓰시는 휴대폰이 갤럭시라면 — 삽니다.</strong> 갤럭시워치8 40mm 블루투스, 쿠팡 <strong>406,430원</strong>.
+       아이폰이라면 이번에는 <strong>사지 않습니다.</strong> 애플워치는 국내에서 혈압을 못 재는데 값은 100만 원이 넘습니다.</p>
+
+    <ul class="why">
+      <li><span class="n">01</span><span class="t">국내에서 <b>혈압을 잴 수 있는 스마트워치는 사실상 갤럭시워치뿐</b>입니다. 삼성 헬스 모니터 앱이 식약처 의료기기 허가를 받았고, 이 기능은 갤럭시 휴대폰에서만 켜집니다.</span></li>
+      <li><span class="n">02</span><span class="t">쿠팡에서 <b>혈압 측정을 내세운 저가 워치는 별점이 확연히 낮습니다.</b> 갤럭시워치8은 4.87점(7,611명), 저가 건강워치는 4.25~4.55점. 카페 여론도 "숫자는 참고용"이라는 쪽입니다.</span></li>
+      <li><span class="n">03</span><span class="t">다만 카페의 실사용자들은 입을 모아 <b>"워치는 보조, 정확한 혈압은 팔뚝 혈압계"</b>라고 말합니다. 워치만으로 혈압 관리를 대신할 생각이라면 사지 않는 편이 낫습니다.</span></li>
+    </ul>
+  </div>
+
+  <svg class="ecg" viewBox="0 0 960 26" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 13 H300"/>
+    <path class="beat" d="M300 13 h22 l9 -9 l11 18 l10 -22 l12 26 l9 -13 h24"/>
+    <path d="M397 13 H960"/>
+  </svg>
+
+  <!-- 1. 결정 흐름 -->
+  <section>
+    <h2><span class="num">01</span>어느 쪽에 해당하시나요</h2>
+    <p class="lede">건강측정용 스마트워치는 "어느 제품이 좋은가"보다 <b>"지금 쓰는 휴대폰이 무엇인가"</b>가 먼저 결론을 갈라놓습니다. 혈압·심전도 기능이 휴대폰 종류에 묶여 있기 때문입니다.</p>
+
+    <div class="branches">
+      <div class="branch pick">
+        <div class="cond">갤럭시 휴대폰을 쓰신다면</div>
+        <div class="ans">삽니다 — 갤럭시워치8 40mm</div>
+        <p class="note">혈압·심전도 둘 다 됩니다. 삼성 헬스 모니터 앱은 갤럭시 휴대폰이 있어야만 설치됩니다. 40mm가 손목에 부담이 적고 값도 가장 쌉니다.</p>
+        <div class="price">406,430원 <span>· 별점 4.87 · 리뷰 7,611</span></div>
+      </div>
+      <div class="branch">
+        <div class="cond">아이폰을 쓰신다면</div>
+        <div class="ans">이번엔 사지 않습니다</div>
+        <p class="note">애플워치는 국내에서 혈압 측정을 지원하지 않습니다. 심전도만 되는데 값은 100만 원이 넘습니다. 건강측정이 목적이라면 값을 치를 이유가 약합니다.</p>
+        <div class="price">1,015,550원 <span>· 시리즈11 42mm</span></div>
+      </div>
+      <div class="branch">
+        <div class="cond">혈압 숫자 자체가 목적이라면</div>
+        <div class="ans">팔뚝 혈압계를 먼저</div>
+        <p class="note">카페 실사용자 다수의 조언입니다. 워치 혈압은 팔뚝 혈압계로 한 번 기준을 잡아준 뒤에야 쓸 수 있고, 그 뒤로도 "참고용"입니다.</p>
+        <div class="price">3~5만 원대 <span>· 전자혈압계</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 쿠팡 -->
+  <section>
+    <h2><span class="num">02</span>쿠팡에서 본 값·별점·리뷰 수</h2>
+    <p class="lede">2026년 9월 7일 쿠팡에서 직접 확인한 숫자입니다. 별점은 화면에 보이는 반올림 값이 아니라, 실제 1~5점 리뷰 개수를 모두 세어 평균을 다시 계산했습니다.</p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>제품</th>
+            <th class="num">쿠팡 판매가</th>
+            <th class="num">별점</th>
+            <th class="num">리뷰 수</th>
+            <th>혈압 측정</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hi">
+            <td>삼성 갤럭시워치8 40mm 블루투스<span class="tag rec">추천</span></td>
+            <td class="num">406,430원</td><td class="num">4.87</td><td class="num">7,611</td><td>가능 (갤럭시폰 필요)</td>
+          </tr>
+          <tr><td>삼성 갤럭시워치8 44mm 블루투스</td><td class="num">433,250원</td><td class="num">4.87</td><td class="num">7,611</td><td>가능 (갤럭시폰 필요)</td></tr>
+          <tr><td>삼성 갤럭시워치8 LTE 40mm</td><td class="num">449,900원</td><td class="num">4.86</td><td class="num">833</td><td>가능 (갤럭시폰 필요)</td></tr>
+          <tr><td>삼성 갤럭시워치8 클래식 46mm</td><td class="num">495,000원</td><td class="num">4.88</td><td class="num">3,603</td><td>가능 (갤럭시폰 필요)</td></tr>
+          <tr><td>삼성 갤럭시워치9 40mm</td><td class="num">498,990원</td><td class="num">4.90</td><td class="num">766</td><td>가능 (갤럭시폰 필요)</td></tr>
+          <tr><td>애플워치 시리즈11 42mm</td><td class="num">1,015,550원</td><td class="num">4.86</td><td class="num">3,369</td><td>국내 미지원</td></tr>
+          <tr><td>애플워치 Ultra3 49mm</td><td class="num">1,301,070원</td><td class="num">4.85</td><td class="num">613</td><td>국내 미지원</td></tr>
+          <tr><td>샤오미 레드미워치6</td><td class="num">139,600원</td><td class="num">4.71</td><td class="num">857</td><td>참고용</td></tr>
+          <tr><td>샤오미 미밴드10 Pro</td><td class="num">98,600원</td><td class="num">4.86</td><td class="num">226</td><td>참고용</td></tr>
+          <tr><td>액션맨 글루코워치<span class="tag warn">주의</span></td><td class="num">168,000원</td><td class="num">4.25</td><td class="num">593</td><td>참고용</td></tr>
+          <tr><td>DAICOO R6 대화면<span class="tag warn">주의</span></td><td class="num">25,900원</td><td class="num">4.53</td><td class="num">3,282</td><td>참고용</td></tr>
+          <tr><td>DAICOO R8 42mm<span class="tag warn">주의</span></td><td class="num">19,900원</td><td class="num">4.55</td><td class="num">11,221</td><td>참고용</td></tr>
+          <tr><td>PEJE ZW02<span class="tag warn">주의</span></td><td class="num">19,600원</td><td class="num">4.33</td><td class="num">707</td><td>참고용</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">"참고용"은 의료기기 허가를 받지 않아 수치를 신뢰할 수 없다는 뜻입니다. 갤럭시워치8 40mm는 와우 회원 쿠폰가 399,020원.</p>
+
+    <div class="chart">
+      <p class="chart-h">별점 — 값이 쌀수록 점수가 내려갑니다</p>
+      <p class="chart-s">가로 눈금은 4.0~5.0점 구간. 청록색이 추천 제품입니다.</p>
+      <div class="bars">
+        <div class="bar-row on" title="갤럭시워치9 40mm · 4.90점 · 766개 리뷰">
+          <div class="lbl">갤럭시워치9 40mm</div>
+          <div class="track"><div class="fill" style="width:90%"></div></div>
+          <div class="val">4.90</div>
+        </div>
+        <div class="bar-row on" title="갤럭시워치8 클래식 46mm · 4.88점 · 3,603개 리뷰">
+          <div class="lbl">갤럭시워치8 클래식</div>
+          <div class="track"><div class="fill" style="width:88%"></div></div>
+          <div class="val">4.88</div>
+        </div>
+        <div class="bar-row on" title="갤럭시워치8 40mm 블루투스 · 4.87점 · 7,611개 리뷰 — 추천 제품">
+          <div class="lbl">갤럭시워치8 40mm</div>
+          <div class="track"><div class="fill" style="width:87%"></div></div>
+          <div class="val">4.87</div>
+        </div>
+        <div class="bar-row" title="애플워치 시리즈11 42mm · 4.86점 · 3,369개 리뷰">
+          <div class="lbl">애플워치 시리즈11</div>
+          <div class="track"><div class="fill" style="width:86%"></div></div>
+          <div class="val">4.86</div>
+        </div>
+        <div class="bar-row" title="샤오미 미밴드10 Pro · 4.86점 · 226개 리뷰">
+          <div class="lbl">샤오미 미밴드10 Pro</div>
+          <div class="track"><div class="fill" style="width:86%"></div></div>
+          <div class="val">4.86</div>
+        </div>
+        <div class="bar-row" title="샤오미 레드미워치6 · 4.71점 · 857개 리뷰">
+          <div class="lbl">샤오미 레드미워치6</div>
+          <div class="track"><div class="fill" style="width:71%"></div></div>
+          <div class="val">4.71</div>
+        </div>
+        <div class="bar-row" title="DAICOO R8 42mm · 4.55점 · 11,221개 리뷰 — 저가 건강워치">
+          <div class="lbl">DAICOO R8 42mm</div>
+          <div class="track"><div class="fill" style="width:55%"></div></div>
+          <div class="val">4.55</div>
+        </div>
+        <div class="bar-row" title="DAICOO R6 대화면 · 4.53점 · 3,282개 리뷰 — 저가 건강워치">
+          <div class="lbl">DAICOO R6 대화면</div>
+          <div class="track"><div class="fill" style="width:53%"></div></div>
+          <div class="val">4.53</div>
+        </div>
+        <div class="bar-row" title="PEJE ZW02 · 4.33점 · 707개 리뷰 — 저가 건강워치">
+          <div class="lbl">PEJE ZW02</div>
+          <div class="track"><div class="fill" style="width:33%"></div></div>
+          <div class="val">4.33</div>
+        </div>
+        <div class="bar-row" title="액션맨 글루코워치 · 4.25점 · 593개 리뷰 — 저가 건강워치">
+          <div class="lbl">액션맨 글루코워치</div>
+          <div class="track"><div class="fill" style="width:25%"></div></div>
+          <div class="val">4.25</div>
+        </div>
+      </div>
+      <div class="axis"><div class="a-pad"></div><div class="a-scale"><span>4.0</span><span>4.25</span><span>4.5</span><span>4.75</span><span>5.0</span></div></div>
+    </div>
+
+    <div class="chart">
+      <p class="chart-h">값 — 같은 "건강 스마트워치"인데 50배 차이</p>
+      <p class="chart-s">쿠팡 판매가 기준, 만 원 단위.</p>
+      <div class="bars">
+        <div class="bar-row" title="애플워치 Ultra3 49mm · 1,301,070원"><div class="lbl">애플워치 Ultra3</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">130.1만</div></div>
+        <div class="bar-row" title="애플워치 시리즈11 42mm · 1,015,550원"><div class="lbl">애플워치 시리즈11</div><div class="track"><div class="fill" style="width:78%"></div></div><div class="val">101.6만</div></div>
+        <div class="bar-row" title="갤럭시워치9 40mm · 498,990원"><div class="lbl">갤럭시워치9 40mm</div><div class="track"><div class="fill" style="width:38%"></div></div><div class="val">49.9만</div></div>
+        <div class="bar-row" title="갤럭시워치8 클래식 46mm · 495,000원"><div class="lbl">갤럭시워치8 클래식</div><div class="track"><div class="fill" style="width:38%"></div></div><div class="val">49.5만</div></div>
+        <div class="bar-row on" title="갤럭시워치8 40mm 블루투스 · 406,430원 — 추천 제품"><div class="lbl">갤럭시워치8 40mm</div><div class="track"><div class="fill" style="width:31%"></div></div><div class="val">40.6만</div></div>
+        <div class="bar-row" title="액션맨 글루코워치 · 168,000원"><div class="lbl">액션맨 글루코워치</div><div class="track"><div class="fill" style="width:13%"></div></div><div class="val">16.8만</div></div>
+        <div class="bar-row" title="샤오미 레드미워치6 · 139,600원"><div class="lbl">샤오미 레드미워치6</div><div class="track"><div class="fill" style="width:11%"></div></div><div class="val">14.0만</div></div>
+        <div class="bar-row" title="샤오미 미밴드10 Pro · 98,600원"><div class="lbl">샤오미 미밴드10 Pro</div><div class="track"><div class="fill" style="width:8%"></div></div><div class="val">9.9만</div></div>
+        <div class="bar-row" title="DAICOO R6 대화면 · 25,900원"><div class="lbl">DAICOO R6 대화면</div><div class="track"><div class="fill" style="width:2%"></div></div><div class="val">2.6만</div></div>
+        <div class="bar-row" title="PEJE ZW02 · 19,600원"><div class="lbl">PEJE ZW02</div><div class="track"><div class="fill" style="width:1.5%"></div></div><div class="val">2.0만</div></div>
+      </div>
+      <div class="axis"><div class="a-pad"></div><div class="a-scale"><span>0</span><span>32만</span><span>65만</span><span>98만</span><span>130만</span></div></div>
+    </div>
+  </section>
+
+  <!-- 3. 별점 뜯어보기 -->
+  <section>
+    <h2><span class="num">03</span>별점 4.87점을 뜯어보면</h2>
+    <p class="lede">평균만 보면 안 됩니다. 갤럭시워치8 40mm에 별점을 준 <b>7,611명이 실제로 몇 점을 줬는지</b> 세어봤습니다.</p>
+
+    <div class="chart">
+      <p class="chart-h">갤럭시워치8 40mm 블루투스 — 별점 분포</p>
+      <p class="chart-s">쿠팡 상품평 7,611건 전수. 주황색은 1~2점(불만) 구간입니다.</p>
+      <div class="dist">
+        <div class="dist-row"><span class="s">5점</span><div class="t"><div class="f" style="width:100%"></div></div><span class="v">6,955명 · 91.4%</span></div>
+        <div class="dist-row"><span class="s">4점</span><div class="t"><div class="f" style="width:6.6%"></div></div><span class="v">456명 · 6.0%</span></div>
+        <div class="dist-row"><span class="s">3점</span><div class="t"><div class="f" style="width:1.4%"></div></div><span class="v">99명 · 1.3%</span></div>
+        <div class="dist-row low"><span class="s">2점</span><div class="t"><div class="f" style="width:0.5%"></div></div><span class="v">34명 · 0.4%</span></div>
+        <div class="dist-row low"><span class="s">1점</span><div class="t"><div class="f" style="width:1%"></div></div><span class="v">67명 · 0.9%</span></div>
+      </div>
+    </div>
+
+    <div class="figs">
+      <div class="fig"><div class="n">91.4<small>%</small></div><div class="c">5점 만점을 준 비율</div></div>
+      <div class="fig"><div class="n">1.3<small>%</small></div><div class="c">1~2점 불만 비율 (101명)</div></div>
+      <div class="fig"><div class="n">300<small>명+</small></div><div class="c">최근 한 달간 구매자 수</div></div>
+      <div class="fig"><div class="n">2025<small>.07</small></div><div class="c">출시 시기 · 1년 지난 모델</div></div>
+    </div>
+
+    <h3>그럼 1~2점 준 101명은 왜 그랬을까</h3>
+    <div class="quotes">
+      <div class="q neg">
+        <blockquote>"디자인도 예쁘고 착용감 좋아서 만족하고 있었는데 위에서 아래로 설정창 불러오는 터치가 엄청 인식률이 안 좋네요."</blockquote>
+        <div class="src"><span>쿠팡 상품평</span><span class="dot"></span><span>갤럭시워치8 · 1~2점</span></div>
+      </div>
+      <div class="q neg">
+        <blockquote>"워치7 사용하다가 넘어왔는데 배터리 끌 수 있는 기능 다 껐는데 배터리가 5분마다 1% 소모되고 있습니다."</blockquote>
+        <div class="src"><span>쿠팡 상품평</span><span class="dot"></span><span>갤럭시워치8 · 1~2점</span></div>
+      </div>
+      <div class="q neg">
+        <blockquote>"개봉 상품인 듯 허술하게 포장된 상태로 배송되었습니다. 박스 포장 또한 대충 포장해서 보냈더군요. 정품이 맞나 의심이 날 정도이니까요."</blockquote>
+        <div class="src"><span>쿠팡 상품평</span><span class="dot"></span><span>갤럭시워치8 · 1~2점</span></div>
+      </div>
+    </div>
+    <p class="caption">불만은 제품 성능보다 <b>포장·배송·초기 불량</b>에 몰려 있습니다. 받자마자 개봉 상태와 화면 터치를 확인하시고, 이상하면 바로 교환 신청하시면 됩니다.</p>
+  </section>
+
+  <svg class="ecg" viewBox="0 0 960 26" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 13 H420"/>
+    <path class="beat" d="M420 13 h22 l9 -9 l11 18 l10 -22 l12 26 l9 -13 h24"/>
+    <path d="M517 13 H960"/>
+  </svg>
+
+  <!-- 4. 광고 걸러내기 -->
+  <section>
+    <h2><span class="num">04</span>카페 글에서 광고 걸러내기</h2>
+    <p class="lede">"스마트워치 후기"로 검색하면 절반이 광고입니다. 아래 기준으로 <b>14건 중 7건을 광고로 판정해 버리고</b>, 남은 7건만 근거로 썼습니다.</p>
+
+    <div class="filterbox">
+      <div class="fbox out">
+        <h4><span class="icon">✕</span>버린 글 — 광고 신호 7건</h4>
+        <ul>
+          <li>본문에 <code>쿠팡 파트너스 활동의 일환으로 수수료를 제공받습니다</code> 문구가 박혀 있음</li>
+          <li>본문에 <code>네이버 쇼핑커넥트 활동의 일환으로</code> 문구 + 구매 링크</li>
+          <li>제목이 <b>"실사용 핵심정리"·"추천 이유"</b>인데 정작 산 흔적이 없고 제품 설명만 옮겨 적음</li>
+          <li>서로 관계없는 상품을 한 글에 억지로 묶음 — <b>"전동칫솔 잇몸손상 걱정에 스마트워치 혈압측정 고민"</b></li>
+          <li>댓글이 죄다 "좋은 정보 감사합니다" 한 줄짜리로만 달림</li>
+          <li>특정 브랜드 이름만 반복하며 장점만 나열 (돌봄파스, 저당코치 등)</li>
+        </ul>
+      </div>
+      <div class="fbox in">
+        <h4><span class="icon">✓</span>남긴 글 — 진짜 후기 7건</h4>
+        <ul>
+          <li>글쓴이가 <b>겪은 상황</b>이 구체적임 — "아빠가 어지럽다고 해서 병원 갔더니"</li>
+          <li>불편한 점을 같이 씀 — "여름이라 땀이 나서 워치가 걸리적거린다"</li>
+          <li>댓글에서 <b>서로 반박이 오감</b> — "혈압 측정은 안 됩니다" ↔ "이제 됩니다"</li>
+          <li>질문 글에 여러 회원이 <b>제각각 다른 답</b>을 달아줌</li>
+          <li>구매 링크가 없고, 특정 브랜드를 밀지 않음</li>
+        </ul>
+      </div>
+    </div>
+    <p class="caption">참고: 진짜 후기 글쓴이 본인도 <b>"광고 말고 회원님들이 직접 써보신 것"</b>을 부탁하고 있었습니다. 카페 안에서도 광고글이 문제로 인식되고 있다는 뜻입니다.</p>
+  </section>
+
+  <!-- 5. 카페 여론 -->
+  <section>
+    <h2><span class="num">05</span>카페 사람들이 실제로 한 말</h2>
+    <p class="lede">광고를 걸러내고 남은 글과 그 댓글들입니다. 시니어·부모님용으로 알아본 글을 중심으로 골랐습니다.</p>
+
+    <h3>혈압 기능에 대하여</h3>
+    <div class="quotes">
+      <div class="q pos">
+        <blockquote>"심전도는 갤럭시 워치가 그나마 정확해요. 친정 엄니도 심장 검사 이상으로 워치5 구입했어요."</blockquote>
+        <div class="src"><span>구미맘 수다방</span><span class="dot"></span><span>2023.06.27</span><span class="dot"></span><span>조회 616 · 댓글</span></div>
+      </div>
+      <div class="q neg">
+        <blockquote>"혈압 정확히 재려면 전자혈압계가 낫겠죠."</blockquote>
+        <div class="src"><span>구미맘 수다방</span><span class="dot"></span><span>2023.06.27</span><span class="dot"></span><span>댓글</span></div>
+      </div>
+      <div class="q neg">
+        <blockquote>"측정은 되는데 의료적으로 신뢰할 정도는 아니라고 써져 있어요. 사진의 레노버 워치는 비추입니다."</blockquote>
+        <div class="src"><span>미스토리(샤오미)</span><span class="dot"></span><span>조회 15,440</span><span class="dot"></span><span>저가 워치 사용자 댓글</span></div>
+      </div>
+      <div class="q pos">
+        <blockquote>"스마트워치를 이용한 혈압 측정은 오차 범위 5±8mmHg 내에서 허용 가능한 정확도를 보이고 있으며, 이는 의료기기 국제 표준을 만족시킬 만한 수준이다."</blockquote>
+        <div class="src"><span>카페 공유 기사</span><span class="dot"></span><span>서울대병원 순환기내과 교수 인용</span></div>
+      </div>
+    </div>
+
+    <h3>실제로 차고 다녀보니</h3>
+    <div class="quotes">
+      <div class="q neg">
+        <blockquote>"하루 종일 워치를 착용하고 다녀보니 여름이라 땀이 많이 나서일까요? 워치가 좀 걸리적거리는 부분이 있습니다. (…) 저런 것들을 지속적으로 측정하면서 건강관리를 하지 않는다면 스마트워치는 그냥 손목시계에 지나지 않는 듯."</blockquote>
+        <div class="src"><span>삼성스마트폰카페</span><span class="dot"></span><span>2024.07.21</span><span class="dot"></span><span>조회 689 · 워치7 첫 사용기</span></div>
+      </div>
+      <div class="q pos">
+        <blockquote>"전 없을 때보다 삶의 질이 더 좋아졌어요. 1년 이상을 써 보니 그래도 있는 게 낫다 느낌이 들더라고요. 저도 처음엔 이거 쓸모없다 생각했어요."</blockquote>
+        <div class="src"><span>삼성스마트폰카페</span><span class="dot"></span><span>댓글</span></div>
+      </div>
+      <div class="q neg">
+        <blockquote>"네 딱 그 정도입니다. 많은 걸 바라시면 안 되고, 알림 오고 수면 만보계 헬스케어가 되는, 충전 하루에 한 번 해줘야 하는 시계."</blockquote>
+        <div class="src"><span>삼성스마트폰카페</span><span class="dot"></span><span>댓글</span></div>
+      </div>
+      <div class="q">
+        <blockquote>"혈압 측정 스마트워치 종류가 많은데 전 그냥 화면 큰 걸로 하나 사드렸네요. 그냥 참고만 하시라고 말씀드리고, 운동 좀 자주 하시라고 말씀드렸네요."</blockquote>
+        <div class="src"><span>부모님 선물용으로 알아본 글</span><span class="dot"></span><span>2026.06.30</span><span class="dot"></span><span>댓글</span></div>
+      </div>
+    </div>
+
+    <h3>배터리는 며칠 가나</h3>
+    <div class="quotes">
+      <div class="q">
+        <blockquote>"공식 사용 시간은 대략 30~40시간 수준입니다. 하지만 이건 '일반 사용' 기준입니다. 화면 항상 켜기(AOD)를 끄면 1.5~2일, 켜면 1~1.5일, 운동·GPS를 자주 쓰면 하루 충전이 필요합니다."</blockquote>
+        <div class="src"><span>워치의모든것</span><span class="dot"></span><span>2026.02.25</span><span class="dot"></span><span>실사용 정리글</span></div>
+      </div>
+    </div>
+    <p class="caption">시니어에게 <b>매일 충전</b>은 실제 장벽입니다. 카페에도 "아날로그 시계 쓰시던 분이라 충전을 번거로워하실 것 같다"는 고민 글이 여럿 있었습니다.</p>
+  </section>
+
+  <!-- 6. 저울 -->
+  <section>
+    <h2><span class="num">06</span>살 이유와 말 이유</h2>
+    <p class="lede">위의 두 자료를 한자리에 놓고 견줘봅니다.</p>
+
+    <div class="scale">
+      <div class="pan up">
+        <h4>살 이유</h4>
+        <div class="score">근거 · 카페 진짜 후기 + 쿠팡 리뷰 7,611건</div>
+        <ol>
+          <li><b>국내에서 혈압을 잴 수 있는 유일한 선택지</b>입니다. 삼성 헬스 모니터 앱이 식약처 의료기기 허가를 받았고, 오차는 5±8mmHg로 국제 표준 안에 듭니다.</li>
+          <li><b>심전도가 실제로 쓰입니다.</b> 카페에는 심장 검사 이상 소견을 받고 갤럭시워치를 산 사례가 여럿 있었습니다.</li>
+          <li><b>별점이 안정적입니다.</b> 7,611명 중 91.4%가 5점, 불만은 1.3%뿐이고 그마저 배송·포장 문제입니다.</li>
+          <li><b>넘어짐 감지·긴급 SOS</b>가 들어 있습니다. 혼자 계실 때를 대비하는 값으로 보면 40만 원이 과하지 않습니다.</li>
+          <li><b>값이 내려간 시점</b>입니다. 2025년 7월 출시 모델이라 후속작(워치9)이 나오면서 정가 419,000원 → 406,430원.</li>
+        </ol>
+      </div>
+      <div class="pan down">
+        <h4>말 이유</h4>
+        <div class="score">근거 · 카페 실사용자 댓글 + 저평점 리뷰</div>
+        <ol>
+          <li><b>혈압계를 대신하지는 못합니다.</b> 팔뚝 혈압계로 먼저 기준을 잡아줘야 하고, 그 뒤로도 카페 여론은 "참고용"입니다.</li>
+          <li><b>매일 충전해야 합니다.</b> 화면을 항상 켜두면 하루~하루 반. 아날로그 시계에 익숙하시면 이게 가장 큰 불편입니다.</li>
+          <li><b>여름에 손목이 답답합니다.</b> 땀이 차서 걸리적거린다는 후기가 실제로 있었습니다.</li>
+          <li><b>안 쓰면 그냥 시계입니다.</b> "지속적으로 측정하면서 건강관리를 하지 않는다면 그냥 손목시계"라는 말이 여러 번 나왔습니다.</li>
+          <li><b>아이폰이면 값이 헛돕니다.</b> 애플워치는 혈압 미지원인데 100만 원이 넘습니다.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 결론 -->
+  <section>
+    <h2><span class="num">07</span>그래서, 이렇게 하시면 됩니다</h2>
+    <p class="lede">갤럭시 휴대폰을 쓰신다는 전제에서의 최종 안내입니다.</p>
+
+    <ul class="checks">
+      <li><span class="box"></span><span><b>먼저 확인</b> — 지금 쓰시는 휴대폰이 갤럭시가 맞는지. 아이폰이면 여기서 멈추십시오.</span></li>
+      <li><span class="box"></span><span><b>살 것</b> — 삼성 갤럭시워치8 40mm 블루투스 (SM-L320N). 쿠팡 406,430원, 와우 회원이면 399,020원.</span></li>
+      <li><span class="box"></span><span><b>LTE 모델은 사지 마십시오.</b> 43,470원 더 비싼 데다 통신 요금이 따로 나갑니다. 휴대폰을 늘 지니고 다니시면 블루투스로 충분합니다.</span></li>
+      <li><span class="box"></span><span><b>44mm가 아니라 40mm</b> — 손목 부담이 적고 26,820원 쌉니다. 다만 글씨가 작게 느껴지시면 44mm(433,250원)도 괜찮습니다.</span></li>
+      <li><span class="box"></span><span><b>같이 사실 것</b> — 팔뚝 전자혈압계 3~5만 원대. 워치 혈압은 이걸로 기준을 잡아줘야 작동합니다.</span></li>
+      <li><span class="box"></span><span><b>받으시면 바로</b> — 포장이 뜯긴 흔적은 없는지, 화면 위에서 아래로 쓸어내리는 터치가 잘 되는지 확인. 이상하면 즉시 교환 신청.</span></li>
+      <li><span class="box"></span><span><b>첫 주에 하실 일</b> — 삼성 헬스 모니터 앱 설치 → 혈압 보정(팔뚝 혈압계 수치 입력) → 심전도 기능 켜기 → 넘어짐 감지와 긴급 SOS 연락처 등록.</span></li>
+      <li><span class="box"></span><span><b>충전 습관</b> — 화면 항상 켜기(AOD)를 끄시면 이틀에 한 번이면 됩니다. 저녁 식사 후 충전 거치대에 올려두는 습관을 들이십시오.</span></li>
+    </ul>
+  </section>
+
+  <!-- 8. 방법 -->
+  <section>
+    <h2><span class="num">08</span>이 리포트를 만든 방법</h2>
+    <div class="method">
+      <h4>조사 경로</h4>
+      <p>로그인한 브라우저에서 <span class="mono">네이버 카페 통합검색</span>으로 "스마트워치 혈압", "스마트워치 혈압 측정 후기", "부모님 스마트워치 추천", "갤럭시워치 배터리 실사용" 등 5개 검색어를 조회했습니다. 검색 결과의 글 본문과 댓글을 직접 열어 읽었고, 회원 전용 게시물은 읽지 못해 제외했습니다.</p>
+      <p>쿠팡은 <span class="mono">갤럭시워치8 / 애플워치 / 혈압측정 스마트워치</span> 세 검색어로 상품 목록을 조회한 뒤, 각 상품 페이지에서 판매가와 <b>1점부터 5점까지의 리뷰 개수</b>를 받아와 평균 별점을 직접 계산했습니다. 화면에 표시되는 별점은 0.5점 단위로 반올림되어 있어 그대로 쓰지 않았습니다.</p>
+
+      <h4>한계</h4>
+      <p>카페 글 중 일부는 회원 전용이라 읽지 못했습니다. 혈압 측정 정확도에 관한 카페 글 일부는 2020~2021년 글이라, 그 이후 삼성 헬스 모니터가 의료기기 허가를 받은 사실이 반영되어 있지 않습니다. 이 점을 감안해 최신 정보로 보정했습니다.</p>
+      <p>가격은 <b>2026년 9월 7일</b> 시점입니다. 쿠팡 가격은 자주 바뀌므로 구매 직전 다시 확인하십시오.</p>
+      <p>이 리포트는 의료 조언이 아닙니다. 혈압·심장 관련 판단은 반드시 의사와 상의하십시오.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>건강 스마트워치 구매 판정서 · 조사일 2026년 9월 7일</p>
+    <p>자료 출처 — 네이버 카페 통합검색(로그인 상태), 쿠팡 상품 페이지 및 상품평</p>
+  </footer>
+
+</div>
