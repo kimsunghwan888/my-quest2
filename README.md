@@ -13,7 +13,7 @@ last_updated: 2026-09-07
 | 2 | 네이버 카페 여론 × 쿠팡 최저가 — 스마트워치 구매 결정 | `quest2-smartwatch/` | 완료 |
 | 3 | 인스타 벤치마킹 — 필사 계정 분석 → 콘텐츠 기획안 3개 | `quest3-instagram/` | 완료 |
 | 4 | My ChatGPT — 성격을 정해준 AI 사서 채팅창 | `quest4-my-chatgpt/` | 완료 |
-| 5 | — | — | 예정 |
+| 5 | My Midjourney — 화풍 8가지를 갖춘 「한 줄 화방」 | `quest5-my-midjourney/` | 완료 |
 | 6 | — | — | 예정 |
 
 ## 이전에 만든 도구들

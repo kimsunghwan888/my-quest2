@@ -1,0 +1,564 @@
+<title>한 줄 화방</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Song+Myung&family=Noto+Sans+KR:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap">
+
+<style>
+:root{
+  --wall:#EDEAE6;
+  --mount:#FFFFFF;
+  --mount-2:#F6F3EF;
+  --ink:#1E1B1E;
+  --ink-2:#5A5359;
+  --ink-3:#8C848A;
+  --line:#DAD4CE;
+  --line-2:#BFB6AE;
+  --plum:#7A3B6B;
+  --plum-soft:#F3E7F0;
+  --plum-ink:#633056;
+  --frame:#2A2528;
+  --shadow:0 1px 2px rgba(30,27,30,.05), 0 14px 32px -22px rgba(30,27,30,.5);
+
+  --f-disp:"Song Myung","Batang",serif;
+  --f-body:"Noto Sans KR","Malgun Gothic",sans-serif;
+  --f-mono:"Space Mono","Consolas",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --wall:#191619; --mount:#221E22; --mount-2:#2A252A;
+    --ink:#EDE8EC; --ink-2:#B2A9B0; --ink-3:#877E86;
+    --line:#332D33; --line-2:#463E46;
+    --plum:#C77FB4; --plum-soft:#2C1B28; --plum-ink:#DDA3CE;
+    --frame:#0E0C0E;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 14px 32px -22px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --wall:#191619; --mount:#221E22; --mount-2:#2A252A;
+  --ink:#EDE8EC; --ink-2:#B2A9B0; --ink-3:#877E86;
+  --line:#332D33; --line-2:#463E46;
+  --plum:#C77FB4; --plum-soft:#2C1B28; --plum-ink:#DDA3CE;
+  --frame:#0E0C0E;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 14px 32px -22px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{background:var(--wall);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:30px 22px 70px}
+
+/* 머리 */
+header.top{display:flex;flex-wrap:wrap;gap:14px 26px;align-items:flex-end;justify-content:space-between;
+  padding-bottom:18px;border-bottom:1px solid var(--line-2)}
+h1{font-family:var(--f-disp);font-size:clamp(27px,3.6vw,40px);margin:0;letter-spacing:.02em;font-weight:400}
+header p{margin:8px 0 0;color:var(--ink-2);font-size:15px;max-width:52ch}
+.plate{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-3);text-transform:uppercase}
+
+/* 작업대 */
+.bench{background:var(--mount);border:1px solid var(--line);box-shadow:var(--shadow);margin-top:26px}
+.bench-sec{padding:20px 24px;border-bottom:1px solid var(--line)}
+.bench-sec:last-child{border-bottom:none}
+.sec-h{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.sec-h .n{font-family:var(--f-mono);font-size:11px;color:var(--plum);font-weight:700}
+.sec-h h2{font-size:15px;font-weight:700;margin:0;letter-spacing:-.01em}
+.sec-h .tip{font-size:13px;color:var(--ink-3);margin-left:auto}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  font-family:var(--f-body);font-size:14.5px;cursor:pointer;
+  background:var(--mount-2);color:var(--ink-2);border:1px solid var(--line);
+  padding:8px 15px;border-radius:999px;transition:all .12s;
+}
+.chip:hover{border-color:var(--line-2);color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--plum);border-color:var(--plum);color:#fff;font-weight:500}
+.chip:focus-visible{outline:2px solid var(--plum);outline-offset:2px}
+:root[data-theme="dark"] .chip[aria-pressed="true"],
+:root:not([data-theme="light"]) .chip[aria-pressed="true"]{color:#1A121A}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) .chip[aria-pressed="true"]{color:#fff}}
+
+/* 프롬프트 */
+.ask{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.ask textarea{
+  flex:1;min-width:260px;background:var(--mount-2);color:var(--ink);border:1px solid var(--line-2);
+  padding:13px 15px;font-family:var(--f-body);font-size:16.5px;line-height:1.6;resize:none;
+  min-height:54px;max-height:140px;border-radius:3px;
+}
+.ask textarea:focus{outline:2px solid var(--plum);outline-offset:1px}
+button{font-family:var(--f-body);font-size:15px;cursor:pointer;border-radius:3px;
+  border:1px solid var(--line-2);background:var(--mount-2);color:var(--ink);padding:13px 22px;transition:background .12s}
+button:hover{background:var(--line)}
+button:focus-visible{outline:2px solid var(--plum);outline-offset:2px}
+button.go{background:var(--plum);border-color:var(--plum);color:#fff;font-weight:500;min-width:112px}
+button.go:hover{filter:brightness(1.12)}
+button.go:disabled{opacity:.5;cursor:not-allowed;filter:none}
+button.small{font-size:13px;padding:6px 12px}
+
+.opts{display:flex;flex-wrap:wrap;gap:18px 26px;align-items:center;margin-top:14px}
+.opt{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--ink-2)}
+.opt select,.opt input[type=number]{
+  background:var(--mount-2);color:var(--ink);border:1px solid var(--line);
+  padding:6px 9px;font-family:var(--f-mono);font-size:13px;border-radius:3px}
+.opt input[type=number]{width:96px}
+
+details.recipe{margin-top:16px;border-top:1px dashed var(--line-2);padding-top:14px}
+details.recipe summary{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);cursor:pointer;list-style:none}
+details.recipe summary::-webkit-details-marker{display:none}
+details.recipe summary::before{content:"▸ ";color:var(--plum)}
+details.recipe[open] summary::before{content:"▾ "}
+details.recipe textarea{width:100%;margin-top:12px;background:var(--mount-2);color:var(--ink-2);
+  border:1px solid var(--line);padding:12px;font-family:var(--f-mono);font-size:12.5px;line-height:1.7;
+  min-height:96px;resize:vertical;border-radius:3px}
+
+/* 전시장 */
+.gallery-h{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:38px 0 16px;
+  padding-bottom:10px;border-bottom:1px solid var(--line-2);flex-wrap:wrap}
+.gallery-h h2{font-family:var(--f-disp);font-size:22px;margin:0;font-weight:400;letter-spacing:.02em}
+.gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:26px}
+.empty{color:var(--ink-3);font-size:15px;padding:44px 0;text-align:center;border:1px dashed var(--line-2);background:var(--mount)}
+
+.work{background:var(--mount);border:1px solid var(--line);box-shadow:var(--shadow);display:flex;flex-direction:column}
+.canvas{background:var(--frame);position:relative;display:grid;place-items:center;min-height:200px}
+.canvas img{display:block;width:100%;height:auto}
+.canvas .load{color:#B7ADB4;font-family:var(--f-mono);font-size:12px;padding:64px 20px;text-align:center;line-height:2}
+.canvas .load .bar{display:block;width:120px;height:2px;background:#3A343A;margin:14px auto 0;overflow:hidden}
+.canvas .load .bar i{display:block;width:40%;height:100%;background:var(--plum);animation:slide 1.3s ease-in-out infinite}
+@keyframes slide{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+.canvas .bad{color:#D99;font-size:13.5px;padding:48px 20px;text-align:center;line-height:1.8}
+
+.label{padding:14px 16px 16px;border-top:1px solid var(--line)}
+.label .ttl{font-family:var(--f-disp);font-size:17px;line-height:1.45;margin:0 0 6px;word-break:keep-all}
+.label .meta{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);letter-spacing:.03em;line-height:1.8}
+.label .meta b{color:var(--plum-ink);font-weight:700}
+.label .row{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+
+footer{margin-top:46px;padding-top:18px;border-top:1px solid var(--line);
+  font-family:var(--f-mono);font-size:11px;color:var(--ink-3);line-height:1.9;letter-spacing:.02em}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:560px){.ask textarea{min-width:100%}button.go{width:100%}}
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>한 줄 화방</h1>
+      <p>한 줄만 적으면 그림이 나옵니다. 화풍과 분위기는 미리 정해두었으니 매번 길게 쓰지 않아도 됩니다.</p>
+    </div>
+    <div class="plate" id="plate">Pollinations · flux · 무료 · 열쇠 없음</div>
+  </header>
+
+  <div class="bench">
+
+    <!-- 1. 화풍 -->
+    <div class="bench-sec">
+      <div class="sec-h"><span class="n">01</span><h2>화풍 고르기</h2><span class="tip">하나만 켜집니다</span></div>
+      <div class="chips" id="styles"></div>
+    </div>
+
+    <!-- 2. 분위기 -->
+    <div class="bench-sec">
+      <div class="sec-h"><span class="n">02</span><h2>분위기 더하기</h2><span class="tip">안 골라도 됩니다</span></div>
+      <div class="chips" id="moods"></div>
+    </div>
+
+    <!-- 3. 무엇을 그릴까 -->
+    <div class="bench-sec">
+      <div class="sec-h"><span class="n">03</span><h2>무엇을 그릴까요</h2><span class="tip">Enter로 바로 그리기</span></div>
+      <div class="ask">
+        <textarea id="prompt" rows="1" placeholder="예) 창가에서 책 읽는 할아버지"></textarea>
+        <button class="go" id="draw">그리기</button>
+      </div>
+
+      <div class="opts">
+        <label class="opt">모양
+          <select id="size">
+            <option value="1024x1024">정사각 1024</option>
+            <option value="1280x768">가로 1280</option>
+            <option value="768x1280">세로 1280</option>
+          </select>
+        </label>
+        <label class="opt">씨앗값
+          <input id="seed" type="number" min="0" max="999999" step="1">
+        </label>
+        <button class="small" id="reseed">씨앗 바꾸기</button>
+        <span class="opt" style="color:var(--ink-3);font-size:13px">같은 씨앗 + 같은 글 = 같은 그림</span>
+      </div>
+
+      <details class="recipe">
+        <summary>화방에 실제로 전달되는 주문서 보기 (직접 손봐도 됩니다)</summary>
+        <p style="margin:10px 0 0;font-size:13px;color:var(--ink-3)">그리는 쪽이 한글을 못 알아들어서, 적으신 글은 <b>보내기 직전에 영어로 자동 번역</b>됩니다. 아래는 화풍·분위기가 어떻게 붙는지 보여주는 미리보기입니다.</p>
+        <textarea id="recipe" spellcheck="false"></textarea>
+      </details>
+    </div>
+  </div>
+
+  <div class="gallery-h">
+    <h2>전시장</h2>
+    <button class="small" id="clearAll">전시장 비우기</button>
+  </div>
+  <div class="gallery" id="gallery"></div>
+  <div class="empty" id="empty">아직 걸린 그림이 없습니다. 위에서 화풍을 고르고 한 줄 적어보세요.</div>
+
+  <footer>
+    <div>퀘스트 5 · My Midjourney — 화풍 미리 설정 + 네트워크 이미지 생성 + 화면 표시</div>
+    <div>그림은 image.pollinations.ai 에서 만들어집니다 · 전시장은 이 브라우저에만 저장됩니다</div>
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const LS = { works:"hwabang.works.v1", pick:"hwabang.pick.v1" };
+
+  // ── 미리 정해둔 화풍 ─────────────────────────────────────
+  const STYLES = [
+    { id:"watercolor", ko:"수채화",   en:"A delicate watercolour painting on rough paper",
+      tag:"watercolour painting, soft colour washes, visible paper grain, bleeding edges, painted not photographed" },
+    { id:"ghibli",     ko:"지브리풍", en:"A Studio Ghibli style hand painted anime illustration",
+      tag:"ghibli anime illustration, cel shading, painted background, nostalgic daylight, 2D animation still" },
+    { id:"pen",        ko:"펜 드로잉", en:"A black ink pen drawing on white paper",
+      tag:"pen and ink drawing, crosshatching, black line art on white, monochrome, no colour, no photograph" },
+    { id:"oil",        ko:"유화",     en:"A classical oil painting on canvas",
+      tag:"oil painting, thick impasto brushstrokes, canvas texture, old master style" },
+    { id:"sumi",       ko:"수묵담채", en:"A traditional Korean ink wash painting on hanji paper",
+      tag:"sumi-e ink wash, brush strokes, muted earth tones, large empty space, oriental painting" },
+    { id:"storybook",  ko:"옛 그림책", en:"A vintage 1950s children's picture book illustration",
+      tag:"retro storybook illustration, flat limited palette, printed paper grain, hand drawn" },
+    { id:"pixel",      ko:"픽셀아트", en:"A 16-bit pixel art scene",
+      tag:"pixel art, blocky pixels, limited retro game palette, sprite" },
+    { id:"photo",      ko:"사진",     en:"A photorealistic photograph",
+      tag:"photograph, natural light, shallow depth of field, 50mm lens, sharp detail" }
+  ];
+
+  const MOODS = [
+    { id:"none",  ko:"없음",     en:"" },
+    { id:"warm",  ko:"따뜻한",   en:"warm golden light, cosy and tender atmosphere" },
+    { id:"calm",  ko:"차분한",   en:"calm quiet atmosphere, muted colours, stillness" },
+    { id:"lonely",ko:"쓸쓸한",   en:"melancholy mood, cool desaturated tones, soft emptiness" },
+    { id:"bright",ko:"밝은",     en:"bright cheerful light, vivid saturated colours, lively" },
+    { id:"myst",  ko:"신비로운", en:"mysterious dreamlike atmosphere, soft haze, quiet magic" }
+  ];
+
+  let pick = Object.assign({ style:"watercolor", mood:"none" }, (() => {
+    try { return JSON.parse(localStorage.getItem(LS.pick) || "{}"); } catch { return {}; }
+  })());
+
+  let works = (() => { try { return JSON.parse(localStorage.getItem(LS.works) || "[]"); } catch { return []; } })();
+  const save = () => { try {
+    localStorage.setItem(LS.works, JSON.stringify(works.slice(0, 40)));
+    localStorage.setItem(LS.pick, JSON.stringify(pick));
+  } catch {} };
+
+  let recipeEdited = false;   // 사용자가 주문서를 직접 손봤는가
+
+  // ── 단추 만들기 ─────────────────────────────────────────
+  function chips(host, list, key) {
+    host.textContent = "";
+    for (const it of list) {
+      const b = document.createElement("button");
+      b.className = "chip";
+      b.type = "button";
+      b.textContent = it.ko;
+      b.setAttribute("aria-pressed", String(pick[key] === it.id));
+      b.addEventListener("click", () => {
+        pick[key] = it.id;
+        recipeEdited = false;
+        chips(host, list, key);
+        drawRecipe();
+        save();
+      });
+      host.appendChild(b);
+    }
+  }
+
+  const styleOf = () => STYLES.find(s => s.id === pick.style) || STYLES[0];
+  const moodOf  = () => MOODS.find(m => m.id === pick.mood)  || MOODS[0];
+
+  // ── 한글은 영어로 바꿔 보낸다 (그림 그리는 쪽이 한글을 못 알아듣는다) ──
+  const hasHangul = (s) => /[가-힣]/.test(s);
+
+  async function toEnglish(text) {
+    if (!hasHangul(text)) return { en: text, via: "그대로" };
+    try {
+      const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=ko&tl=en&dt=t&q=" + encodeURIComponent(text));
+      if (r.ok) {
+        const j = await r.json();
+        const en = (j?.[0] || []).map(x => x[0]).join("").trim();
+        if (en) return { en, via: "번역함" };
+      }
+    } catch {}
+    try {
+      const r = await fetch("https://api.mymemory.translated.net/get?langpair=ko%7Cen&q=" + encodeURIComponent(text));
+      if (r.ok) {
+        const j = await r.json();
+        const en = (j?.responseData?.translatedText || "").trim();
+        if (en) return { en, via: "번역함" };
+      }
+    } catch {}
+    return { en: text, via: "번역 실패" };   // 최후에는 한글 그대로 보낸다
+  }
+
+  // ── 주문서(최종 프롬프트) 만들기 ─────────────────────────
+  // 화풍을 맨 앞에 두고 끝에서 한 번 더 못박아야 그림에 확실히 반영된다
+  function buildRecipe(subject) {
+    const s = styleOf(), m = moodOf();
+    const parts = [
+      s.en + " of " + (subject || "").trim(),
+      m.en,
+      s.tag,
+      "no text, no watermark, no signature"
+    ];
+    return parts.filter(Boolean).join(", ");
+  }
+  function drawRecipe() {
+    if (recipeEdited) return;
+    $("recipe").value = buildRecipe($("prompt").value || "(여기에 적은 내용이 들어갑니다)");
+  }
+
+  // ── 그림 주문 ───────────────────────────────────────────
+  function imageURL(recipe, w, h, seed) {
+    const q = new URLSearchParams({ width:w, height:h, seed:String(seed), model:"flux", nologo:"true", enhance:"false" });
+    return "https://image.pollinations.ai/prompt/" + encodeURIComponent(recipe) + "?" + q.toString();
+  }
+
+  async function draw() {
+    const subject = $("prompt").value.trim();
+    if (!subject) { $("prompt").focus(); return; }
+
+    const [w, h] = $("size").value.split("x").map(Number);
+    const seed = Number($("seed").value) || 0;
+
+    const btn = $("draw");
+    btn.disabled = true; btn.textContent = "번역 중…";
+    let recipe, subjectEn = subject, via = "그대로";
+    try {
+      if (recipeEdited) {
+        recipe = $("recipe").value.trim();
+      } else {
+        const t = await toEnglish(subject);
+        subjectEn = t.en; via = t.via;
+        recipe = buildRecipe(subjectEn);
+      }
+    } finally {
+      btn.disabled = false; btn.textContent = "그리기";
+    }
+
+    works.unshift({
+      id: "w" + Date.now(),
+      subject, subjectEn, via, recipe, w, h, seed,
+      styleKo: styleOf().ko, moodKo: moodOf().ko,
+      url: imageURL(recipe, w, h, seed),
+      at: Date.now()
+    });
+    save();
+    render();
+    $("prompt").value = "";
+    $("prompt").style.height = "auto";
+    recipeEdited = false;
+    drawRecipe();
+    reseed();
+  }
+
+  // ── 이미 받은 그림은 기억해 둔다 (화면을 다시 그려도 재요청 금지) ──
+  const done = new Map();     // id → {img, blob}
+  const bad  = new Map();     // id → 실패 이유
+  const busy = new Set();     // id (받는 중)
+
+  // ── 그림 받아오기: 한 번에 한 장씩 (한꺼번에 조르면 거절당함) ──
+  const queue = [];
+  let working = false;
+  function enqueue(job) { queue.push(job); pump(); }
+  async function pump() {
+    if (working) return;
+    working = true;
+    while (queue.length) {
+      const job = queue.shift();
+      try { await job(); } catch {}
+      await new Promise(r => setTimeout(r, 3000));   // 무료 화방이라 사이를 넉넉히 띄운다
+    }
+    working = false;
+  }
+
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  // 한 장 받아오기. 붐비면(429) 기다렸다 두 번까지 다시 시도한다.
+  async function fetchImage(url, onNote) {
+    const waits = [0, 9000, 22000];          // 첫 시도 → 9초 뒤 → 22초 뒤
+    let last = "unknown";
+    for (let i = 0; i < waits.length; i++) {
+      if (waits[i]) { onNote?.("화방이 붐빕니다. " + Math.round(waits[i]/1000) + "초 뒤 다시 부탁해 봅니다"); await sleep(waits[i]); }
+      let res;
+      try { res = await fetch(url, { cache: "force-cache" }); }
+      catch { last = "network"; continue; }
+      if (res.ok) {
+        const blob = await res.blob();
+        const img = new Image();
+        img.decoding = "async";
+        await new Promise((ok, no) => { img.onload = ok; img.onerror = no; img.src = URL.createObjectURL(blob); });
+        return { img, blob };
+      }
+      last = res.status === 429 ? "busy" : ("http" + res.status);
+      if (res.status !== 429) break;         // 붐빔이 아니면 다시 시도해도 소용없다
+    }
+    // fetch 자체가 막힌 경우(파일을 그냥 두 번 눌러 연 경우 등) — 옛 방식으로 한 번 더
+    if (last === "network") {
+      try {
+        const img = await new Promise((ok, no) => {
+          const i = new Image(); i.onload = () => ok(i); i.onerror = no; i.src = url;
+        });
+        return { img, blob: null };          // 파일 저장은 새 탭으로 대신한다
+      } catch {}
+    }
+    throw new Error(last);
+  }
+
+  const FAILMSG = {
+    busy:    "무료 화방이 지금 많이 붐빕니다.\n1~2분 뒤에 «다시 그리기»를 눌러주세요.",
+    network: "인터넷 연결이 끊긴 것 같습니다.\n연결을 확인하고 «다시 그리기»를 눌러주세요."
+  };
+
+  // ── 전시장 그리기 ───────────────────────────────────────
+  function hhmm(ts){ const d=new Date(ts); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+
+  function card(wk) {
+    const el = document.createElement("article");
+    el.className = "work";
+
+    const canvas = document.createElement("div");
+    canvas.className = "canvas";
+    canvas.style.aspectRatio = wk.w + " / " + wk.h;
+
+    const loading = document.createElement("div");
+    loading.className = "load";
+    loading.innerHTML = "화방에서 그리는 중입니다<br>10초에서 30초쯤 걸립니다<span class='bar'><i></i></span>";
+    canvas.appendChild(loading);
+
+    const label = document.createElement("div");
+    label.className = "label";
+
+    const ttl = document.createElement("p");
+    ttl.className = "ttl";
+    ttl.textContent = wk.subject;
+
+    const meta = document.createElement("div");
+    meta.className = "meta";
+    const metaLine = (px) => "<b>" + wk.styleKo + "</b>" + (wk.moodKo && wk.moodKo !== "없음" ? " · " + wk.moodKo : "")
+      + (wk.via === "번역 실패" ? "<br>⚠ 영어로 못 바꿨습니다 — 그림이 엉뚱할 수 있습니다"
+         : (wk.subjectEn && wk.subjectEn !== wk.subject ? "<br>→ " + wk.subjectEn : ""))
+      + "<br>" + px + " · 씨앗 " + wk.seed + " · " + hhmm(wk.at);
+    meta.innerHTML = metaLine(wk.w + "×" + wk.h);
+
+    const row = document.createElement("div");
+    row.className = "row";
+
+    const open = document.createElement("button");
+    open.className = "small";
+    open.textContent = "그림 저장";
+    open.title = "그림 파일을 내 컴퓨터에 내려받습니다";
+    open.addEventListener("click", () => {
+      const got = done.get(wk.id);
+      if (!got || !got.blob) { window.open(wk.url, "_blank", "noopener"); return; }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(got.blob);
+      a.download = (wk.subject.slice(0, 20).replace(/[\\/:*?"<>|]/g, "") || "그림") + "_" + wk.styleKo + "_" + wk.seed + ".jpg";
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    });
+
+    const again = document.createElement("button");
+    again.className = "small";
+    again.textContent = "다시 그리기";
+    again.addEventListener("click", () => {
+      const s = Math.floor(Math.random() * 1000000);
+      works.unshift(Object.assign({}, wk, { id:"w"+Date.now(), seed:s, url:imageURL(wk.recipe, wk.w, wk.h, s), at:Date.now() }));
+      save(); render();
+    });
+
+    const del = document.createElement("button");
+    del.className = "small";
+    del.textContent = "내리기";
+    del.addEventListener("click", () => {
+      works = works.filter(x => x.id !== wk.id);
+      done.delete(wk.id); bad.delete(wk.id);
+      save(); render();
+    });
+
+    row.append(open, again, del);
+    label.append(ttl, meta, row);
+    el.append(canvas, label);
+
+    const showImg = (img) => {
+      canvas.textContent = "";
+      canvas.style.aspectRatio = "";
+      canvas.appendChild(img);
+      meta.innerHTML = metaLine(img.naturalWidth + "×" + img.naturalHeight);
+    };
+    const showBad = (why) => {
+      canvas.textContent = "";
+      const b = document.createElement("div");
+      b.className = "bad";
+      b.textContent = FAILMSG[why] || "그림을 받아오지 못했습니다.\n아래 «다시 그리기»를 눌러보세요.";
+      canvas.appendChild(b);
+    };
+
+    if (done.has(wk.id)) {                 // 이미 받아둔 그림 — 그대로 건다
+      showImg(done.get(wk.id).img);
+    } else if (bad.has(wk.id)) {
+      showBad(bad.get(wk.id));
+    } else if (!busy.has(wk.id)) {         // 아직 안 받았고 받는 중도 아니면 줄을 세운다
+      busy.add(wk.id);
+      enqueue(async () => {
+        try {
+          const got = await fetchImage(wk.url, (note) => {
+            if (loading.isConnected) loading.innerHTML = note + "<span class='bar'><i></i></span>";
+          });
+          got.img.alt = wk.subject;
+          done.set(wk.id, got);
+          render();                        // 받은 그림을 화면에 반영
+        } catch (e) {
+          bad.set(wk.id, String((e && e.message) || "unknown"));
+          render();
+        } finally {
+          busy.delete(wk.id);
+        }
+      });
+    }
+
+    return el;
+  }
+
+  function render() {
+    const g = $("gallery");
+    g.textContent = "";
+    for (const wk of works) g.appendChild(card(wk));
+    $("empty").hidden = works.length > 0;
+  }
+
+  function reseed(){ $("seed").value = Math.floor(Math.random() * 1000000); }
+
+  // ── 이벤트 ─────────────────────────────────────────────
+  $("draw").addEventListener("click", draw);
+  $("prompt").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); draw(); }
+  });
+  $("prompt").addEventListener("input", (e) => {
+    e.target.style.height = "auto";
+    e.target.style.height = Math.min(e.target.scrollHeight, 140) + "px";
+    drawRecipe();
+  });
+  $("recipe").addEventListener("input", () => { recipeEdited = true; });
+  $("reseed").addEventListener("click", reseed);
+  $("clearAll").addEventListener("click", () => {
+    if (works.length && !confirm("전시장의 그림을 모두 내립니다. 계속할까요?")) return;
+    works = []; done.clear(); bad.clear(); save(); render();
+  });
+
+  // ── 시작 ──────────────────────────────────────────────
+  chips($("styles"), STYLES, "style");
+  chips($("moods"), MOODS, "mood");
+  reseed();
+  drawRecipe();
+  render();
+})();
+</script>
