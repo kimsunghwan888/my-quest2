@@ -1,0 +1,506 @@
+<title>필사 계정 벤치마킹 기획안</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&family=Nanum+Pen+Script&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --ground:#F4F3EF;
+  --surface:#FBFAF7;
+  --surface-2:#EBE9E2;
+  --ink:#191C22;
+  --ink-2:#4A4F5A;
+  --ink-3:#7A8090;
+  --line:#DEDBD3;
+  --line-2:#C6C2B6;
+
+  --blue:#2E4BA8;        /* 검증됨 (light surface #F4F3EF) */
+  --blue-soft:#E3E7F5;
+  --rust:#B0552A;        /* 검증됨 */
+  --rust-soft:#F4E8DF;
+  --bar-muted:#CFCCC2;
+
+  --f-disp:"Nanum Myeongjo", "Batang", serif;
+  --f-body:"Noto Sans KR", "Malgun Gothic", sans-serif;
+  --f-hand:"Nanum Pen Script", "Malgun Gothic", cursive;
+  --f-mono:"IBM Plex Mono", monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#16181D; --surface:#1E2128; --surface-2:#272B33;
+    --ink:#E8E9EC; --ink-2:#B0B5C0; --ink-3:#848A97;
+    --line:#31353E; --line-2:#454B57;
+    --blue:#6A82D8; --blue-soft:#1E2740;
+    --rust:#C67A4C; --rust-soft:#33251A;
+    --bar-muted:#3B404A;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#16181D; --surface:#1E2128; --surface-2:#272B33;
+  --ink:#E8E9EC; --ink-2:#B0B5C0; --ink-3:#848A97;
+  --line:#31353E; --line-2:#454B57;
+  --blue:#6A82D8; --blue-soft:#1E2740;
+  --rust:#C67A4C; --rust-soft:#33251A;
+  --bar-muted:#3B404A;
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground); color:var(--ink);
+  font-family:var(--f-body); font-size:17px; line-height:1.78; font-weight:400;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 100px}
+
+/* 헤더 */
+.top{padding:52px 0 26px;border-bottom:3px double var(--line-2)}
+.kicker{
+  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--rust);font-weight:600;margin:0 0 14px;
+}
+h1{
+  font-family:var(--f-disp);font-weight:800;
+  font-size:clamp(31px,5vw,50px);line-height:1.22;margin:0;letter-spacing:-.01em;text-wrap:balance;
+}
+.dek{margin:16px 0 0;color:var(--ink-2);font-size:17px;max-width:56ch}
+.byline{
+  margin-top:20px;display:flex;flex-wrap:wrap;gap:8px 22px;
+  font-family:var(--f-mono);font-size:12.5px;color:var(--ink-3);
+}
+.byline b{color:var(--ink-2);font-weight:500}
+
+/* 핵심 숫자 */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:36px}
+.tile{background:var(--surface);padding:20px 18px}
+.tile .v{font-family:var(--f-mono);font-size:29px;font-weight:600;line-height:1.05;letter-spacing:-.02em;color:var(--blue)}
+.tile .v small{font-size:14px;font-weight:400;color:var(--ink-3);margin-left:3px}
+.tile .k{font-size:13px;color:var(--ink-3);margin-top:8px;line-height:1.5}
+
+/* 섹션 */
+section{margin-top:62px}
+h2{
+  font-family:var(--f-disp);font-weight:700;font-size:27px;line-height:1.35;margin:0 0 8px;
+  padding-bottom:10px;border-bottom:1px solid var(--line-2);
+  display:flex;align-items:baseline;gap:12px;
+}
+h2 .no{font-family:var(--f-mono);font-size:13px;color:var(--rust);font-weight:600;flex:none}
+.lede{margin:16px 0 24px;color:var(--ink-2);font-size:16.5px;max-width:64ch}
+h3{font-family:var(--f-disp);font-weight:700;font-size:19px;margin:36px 0 12px}
+
+/* 표 */
+.tw{overflow-x:auto;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:660px;font-size:15px}
+th,td{padding:11px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--surface-2);font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--ink-2);white-space:nowrap}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:last-child td{border-bottom:none}
+tr.top1 td{background:var(--blue-soft)}
+tr.top2 td{background:var(--rust-soft)}
+.pill{display:inline-block;font-size:11.5px;font-family:var(--f-mono);padding:1px 7px;border:1px solid var(--line-2);color:var(--ink-2);white-space:nowrap}
+.pill.reel{border-color:var(--blue);color:var(--blue)}
+.cap{font-size:13.5px;color:var(--ink-3);margin:10px 0 0;line-height:1.6}
+
+/* 차트 */
+.chart{background:var(--surface);border:1px solid var(--line);padding:22px 24px;margin-top:20px}
+.ch-t{font-size:15px;font-weight:700;margin:0 0 4px}
+.ch-s{font-size:13.5px;color:var(--ink-3);margin:0 0 18px}
+.bars{display:grid;gap:9px}
+.row{display:grid;grid-template-columns:minmax(120px,210px) 1fr auto;gap:13px;align-items:center}
+.row .l{font-size:14px;color:var(--ink-2);text-align:right;line-height:1.35}
+.row.hi .l{color:var(--ink);font-weight:700}
+.tr{background:var(--surface-2);height:15px;position:relative}
+.fl{height:100%;background:var(--bar-muted);border-radius:0 4px 4px 0;transition:filter .15s}
+.row.hi .fl{background:var(--blue)}
+.row.hi2 .fl{background:var(--rust)}
+.row:hover .fl{filter:brightness(1.07) saturate(1.12)}
+.row .v{font-family:var(--f-mono);font-size:13.5px;color:var(--ink-2);min-width:52px;text-align:right;font-variant-numeric:tabular-nums}
+.row.hi .v,.row.hi2 .v{color:var(--ink);font-weight:600}
+.ax{display:flex;margin-top:12px;padding-top:8px;border-top:1px solid var(--line);font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.ax .pad{width:210px;flex:none}
+.ax .sc{flex:1;display:flex;justify-content:space-between}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}
+@media (max-width:700px){.duo{grid-template-columns:1fr}}
+
+/* 공식 카드 */
+.rules{display:grid;gap:16px;margin-top:20px}
+.rule{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--blue);padding:24px 26px}
+.rule .tagno{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;color:var(--rust);font-weight:600}
+.rule h4{font-family:var(--f-disp);font-weight:700;font-size:21px;margin:6px 0 12px;line-height:1.4}
+.rule p{margin:0 0 14px;color:var(--ink-2);font-size:16px}
+.rule p:last-child{margin-bottom:0}
+.proof{background:var(--surface-2);padding:14px 16px;font-size:14.5px;color:var(--ink-2);border-left:2px solid var(--line-2)}
+.proof b{font-family:var(--f-mono);color:var(--ink);font-weight:600}
+
+/* 빈틈 */
+.gaps{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line)}
+.gaps li{background:var(--surface);padding:16px 20px;display:flex;gap:15px;align-items:flex-start;font-size:16px;color:var(--ink-2)}
+.gaps .mk{font-family:var(--f-mono);font-size:11px;font-weight:700;color:var(--rust);background:var(--rust-soft);padding:2px 7px;flex:none;margin-top:4px}
+.gaps b{color:var(--ink);font-weight:700}
+
+/* 기획안 */
+.plans{display:grid;gap:22px;margin-top:22px}
+.plan{background:var(--surface);border:1px solid var(--line-2);padding:0;overflow:hidden}
+.plan-h{padding:22px 26px 18px;border-bottom:1px dashed var(--line-2);background:var(--surface-2)}
+.plan-h .no{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;color:var(--ink-3)}
+.plan-h .name{font-family:var(--f-hand);font-size:36px;line-height:1.15;color:var(--blue);margin:2px 0 6px}
+.plan-h .one{font-size:15.5px;color:var(--ink-2);margin:0}
+.plan-b{padding:22px 26px 26px}
+.spec{display:grid;grid-template-columns:88px 1fr;gap:10px 16px;font-size:15.5px;margin-bottom:20px}
+.spec dt{font-size:13px;color:var(--ink-3);font-weight:500;padding-top:3px}
+.spec dd{margin:0;color:var(--ink-2)}
+.spec dd b{color:var(--ink);font-weight:700}
+.slidebox{background:var(--ground);border:1px solid var(--line);padding:16px 18px;margin-bottom:18px}
+.slidebox .h{font-size:12.5px;font-family:var(--f-mono);letter-spacing:.08em;color:var(--ink-3);margin-bottom:10px}
+.slidebox ol{margin:0;padding-left:20px;display:grid;gap:7px}
+.slidebox li{font-size:15px;color:var(--ink-2);line-height:1.6}
+.slidebox li b{color:var(--ink)}
+.firstline{
+  font-family:var(--f-hand);font-size:27px;line-height:1.4;color:var(--ink);
+  background:var(--blue-soft);padding:14px 18px;margin:0 0 18px;
+}
+.tags{font-family:var(--f-mono);font-size:13px;color:var(--blue);word-break:keep-all;line-height:1.9;margin-bottom:18px}
+.why{background:var(--rust-soft);border-left:3px solid var(--rust);padding:14px 17px;font-size:15px;color:var(--ink-2)}
+.why b{color:var(--ink);font-weight:700}
+.why .lab{font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;color:var(--rust);display:block;margin-bottom:6px;font-weight:600}
+
+/* 실행 계획 */
+.weeks{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:20px}
+.week{background:var(--surface);padding:16px 20px;display:grid;grid-template-columns:76px 1fr;gap:16px;align-items:baseline}
+.week .w{font-family:var(--f-mono);font-size:13px;color:var(--rust);font-weight:600}
+.week .d{font-size:15.5px;color:var(--ink-2)}
+.week .d b{color:var(--ink);font-weight:700}
+
+.method{background:var(--surface-2);border:1px solid var(--line);padding:22px 24px;margin-top:20px;font-size:14.5px;color:var(--ink-2);line-height:1.75}
+.method h4{margin:0 0 10px;font-size:14px;color:var(--ink);font-weight:700}
+.method p{margin:0 0 12px}
+.method p:last-child{margin:0}
+.method code{font-family:var(--f-mono);font-size:13px;background:var(--surface);padding:1px 5px;border:1px solid var(--line)}
+
+footer{margin-top:66px;padding-top:20px;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink-3)}
+footer p{margin:0 0 6px}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:640px){
+  body{font-size:16px}
+  .row{grid-template-columns:minmax(92px,128px) 1fr auto;gap:9px}
+  .ax .pad{width:128px}
+  .spec{grid-template-columns:1fr;gap:2px 0}
+  .spec dt{padding-top:10px}
+}
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <p class="kicker">퀘스트 3 · 인스타 벤치마킹</p>
+    <h1>필사하는 사람들은<br>무엇에 반응하는가</h1>
+    <p class="dek">팔로워 7,618명의 북스타그램 계정 <b>@yozo_anne</b>의 최근 게시물 15개를 하나씩 열어보고, 반응이 좋았던 글의 공통점을 뽑아 내 콘텐츠 기획안 3개로 옮겼습니다.</p>
+    <div class="byline">
+      <span>조사일 <b>2026. 09. 07</b></span>
+      <span>분석 게시물 <b>15개</b></span>
+      <span>기간 <b>08.23 ~ 09.06</b></span>
+      <span>내 분야 <b>책 · 글쓰기 · 기록</b></span>
+    </div>
+  </header>
+
+  <div class="tiles">
+    <div class="tile"><div class="v">249</div><div class="k">게시물당 평균 좋아요</div></div>
+    <div class="tile"><div class="v">95</div><div class="k">게시물당 평균 댓글</div></div>
+    <div class="tile"><div class="v">419</div><div class="k">최고 좋아요 (서평단 릴스)</div></div>
+    <div class="tile"><div class="v">278</div><div class="k">최고 댓글 (같은 글)</div></div>
+    <div class="tile"><div class="v">3.3<small>%</small></div><div class="k">평균 좋아요 ÷ 팔로워</div></div>
+  </div>
+
+  <!-- 01 -->
+  <section>
+    <h2><span class="no">01</span>왜 이 계정을 골랐나</h2>
+    <p class="lede">거대 상업 계정은 참고가 되지 않습니다. 혼자 운영하면서 꾸준히 반응을 얻는, <b>따라 할 수 있는 규모</b>의 계정을 골랐습니다.</p>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th>항목</th><th>내용</th></tr></thead>
+        <tbody>
+          <tr><td>계정</td><td>@yozo_anne — 요조앤 · 북스타그램 · 필사러 · 기록러버</td></tr>
+          <tr><td>팔로워</td><td class="n">7,618명</td></tr>
+          <tr><td>누적 게시물</td><td class="n">921개</td></tr>
+          <tr><td>정체성</td><td>“책은 일상, 일상은 책” · 필사모임 &lt;사각&gt; 운영 · 사춘기 아들과 책 읽는 엄마</td></tr>
+          <tr><td>주 수익 구조</td><td>출판사 서평단 모집 · 도서 협찬 · 서평 작성</td></tr>
+          <tr><td>고른 이유</td><td>연예인·출판사 공식 계정이 아닌 <b>개인 계정</b>이고, ‘필사’와 ‘기록’이라는 내 주제와 정확히 겹칩니다</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 02 -->
+  <section>
+    <h2><span class="no">02</span>게시물 15개를 하나씩 열어봤습니다</h2>
+    <p class="lede">2026년 8월 23일부터 9월 6일까지, 최근 15개입니다. 계정을 빠르게 훑으면 인스타그램이 차단하므로 <b>한 개씩 열고 6초 이상 쉬면서</b> 기록했습니다.</p>
+
+    <div class="tw">
+      <table>
+        <thead>
+          <tr><th class="n">#</th><th>날짜</th><th>형식</th><th>무엇을 올렸나</th><th class="n">좋아요</th><th class="n">댓글</th></tr>
+        </thead>
+        <tbody>
+          <tr class="top1"><td class="n">1</td><td>09.06</td><td><span class="pill reel">릴스</span></td><td>서평단 모집 — 《디어 윌버 문구점》 <b>(1위)</b></td><td class="n">419</td><td class="n">278</td></tr>
+          <tr class="top2"><td class="n">2</td><td>08.30</td><td><span class="pill">슬라이드</span></td><td>8월에 완독한 책 19권을 한 줄씩 정리 <b>(2위)</b></td><td class="n">370</td><td class="n">—</td></tr>
+          <tr><td class="n">3</td><td>09.05</td><td><span class="pill">슬라이드</span></td><td>9월 첫 주 ‘책탑’ — 받은 책을 쌓아 찍기</td><td class="n">277</td><td class="n">72</td></tr>
+          <tr><td class="n">4</td><td>08.31</td><td><span class="pill reel">릴스</span></td><td>서평단 모집 — 《뭉우리돌의 광야》</td><td class="n">258</td><td class="n">103</td></tr>
+          <tr><td class="n">5</td><td>09.04</td><td><span class="pill reel">릴스</span></td><td>서평단 모집 — 《동기화되었습니다》</td><td class="n">255</td><td class="n">103</td></tr>
+          <tr><td class="n">6</td><td>08.28</td><td><span class="pill">슬라이드</span></td><td>책 소개 — 《나에게 분명 문제가 있습니다》</td><td class="n">255</td><td class="n">61</td></tr>
+          <tr><td class="n">7</td><td>09.04</td><td><span class="pill reel">릴스</span></td><td>사전 서평단 — 《부의 영혼》</td><td class="n">246</td><td class="n">111</td></tr>
+          <tr><td class="n">8</td><td>08.23</td><td><span class="pill">슬라이드</span></td><td>책 소개 — 《마음 놓고 쉬고 싶은 당신을 위한 필사 노트》</td><td class="n">239</td><td class="n">91</td></tr>
+          <tr><td class="n">9</td><td>08.24</td><td><span class="pill">슬라이드</span></td><td>선물하기 좋은 그림 에세이 추천</td><td class="n">230</td><td class="n">70</td></tr>
+          <tr><td class="n">10</td><td>09.04</td><td><span class="pill">슬라이드</span></td><td>소설 소개 + <b>아들이 표지 보고 놀란 이야기</b></td><td class="n">228</td><td class="n">101</td></tr>
+          <tr><td class="n">11</td><td>08.29</td><td><span class="pill">슬라이드</span></td><td>책 소개 — 《도파민 과잉시대 당신의 뇌가 무너진다》</td><td class="n">219</td><td class="n">77</td></tr>
+          <tr><td class="n">12</td><td>08.31</td><td><span class="pill">슬라이드</span></td><td>책 소개 — 만화로 꿰뚫는 경제사</td><td class="n">206</td><td class="n">63</td></tr>
+          <tr><td class="n">13</td><td>09.01</td><td><span class="pill">슬라이드</span></td><td>서평단 <b>예고</b> — 《동기화되었습니다》</td><td class="n">197</td><td class="n">59</td></tr>
+          <tr><td class="n">14</td><td>08.26</td><td><span class="pill">슬라이드</span></td><td>서평단 <b>예고</b> — 《뭉우리돌의 광야》</td><td class="n">189</td><td class="n">76</td></tr>
+          <tr><td class="n">15</td><td>08.25</td><td><span class="pill">슬라이드</span></td><td>책 소개 — 10대를 위한 한자 어휘 일력 <b>(최하위)</b></td><td class="n">151</td><td class="n">58</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">2위 글은 댓글 기능이 꺼져 있어 댓글 수가 표시되지 않습니다. 평균 댓글 95는 나머지 14개로 계산했습니다.</p>
+
+    <div class="chart">
+      <p class="ch-t">좋아요 — 위아래 차이가 2.8배</p>
+      <p class="ch-s">가로 눈금 0~420. 파란색은 1위, 주황색은 2위입니다. 막대에 마우스를 올리면 자세히 보입니다.</p>
+      <div class="bars">
+        <div class="row hi" title="서평단 모집 릴스 · 좋아요 419 · 댓글 278"><div class="l">서평단 모집 (릴스)</div><div class="tr"><div class="fl" style="width:100%"></div></div><div class="v">419</div></div>
+        <div class="row hi2" title="8월 완독책 한 줄 기록 · 좋아요 370"><div class="l">한 달 완독책 기록</div><div class="tr"><div class="fl" style="width:88%"></div></div><div class="v">370</div></div>
+        <div class="row" title="9월 책탑 · 좋아요 277 · 댓글 72"><div class="l">9월 책탑</div><div class="tr"><div class="fl" style="width:66%"></div></div><div class="v">277</div></div>
+        <div class="row" title="서평단 모집 뭉우리돌 (릴스) · 좋아요 258 · 댓글 103"><div class="l">서평단 모집 (릴스)</div><div class="tr"><div class="fl" style="width:62%"></div></div><div class="v">258</div></div>
+        <div class="row" title="서평단 모집 동기화 (릴스) · 좋아요 255 · 댓글 103"><div class="l">서평단 모집 (릴스)</div><div class="tr"><div class="fl" style="width:61%"></div></div><div class="v">255</div></div>
+        <div class="row" title="책 소개 나에게 분명 문제가 · 좋아요 255 · 댓글 61"><div class="l">책 소개</div><div class="tr"><div class="fl" style="width:61%"></div></div><div class="v">255</div></div>
+        <div class="row" title="사전 서평단 부의 영혼 (릴스) · 좋아요 246 · 댓글 111"><div class="l">사전 서평단 (릴스)</div><div class="tr"><div class="fl" style="width:59%"></div></div><div class="v">246</div></div>
+        <div class="row" title="필사 노트 책 소개 · 좋아요 239 · 댓글 91"><div class="l">필사 노트 소개</div><div class="tr"><div class="fl" style="width:57%"></div></div><div class="v">239</div></div>
+        <div class="row" title="그림 에세이 추천 · 좋아요 230 · 댓글 70"><div class="l">그림 에세이 추천</div><div class="tr"><div class="fl" style="width:55%"></div></div><div class="v">230</div></div>
+        <div class="row" title="소설 소개 + 아들 이야기 · 좋아요 228 · 댓글 101"><div class="l">소설 + 내 이야기</div><div class="tr"><div class="fl" style="width:54%"></div></div><div class="v">228</div></div>
+        <div class="row" title="도파민 과잉시대 책 소개 · 좋아요 219 · 댓글 77"><div class="l">책 소개</div><div class="tr"><div class="fl" style="width:52%"></div></div><div class="v">219</div></div>
+        <div class="row" title="만화 경제사 책 소개 · 좋아요 206 · 댓글 63"><div class="l">책 소개</div><div class="tr"><div class="fl" style="width:49%"></div></div><div class="v">206</div></div>
+        <div class="row" title="서평단 예고 동기화 · 좋아요 197 · 댓글 59"><div class="l">서평단 예고</div><div class="tr"><div class="fl" style="width:47%"></div></div><div class="v">197</div></div>
+        <div class="row" title="서평단 예고 뭉우리돌 · 좋아요 189 · 댓글 76"><div class="l">서평단 예고</div><div class="tr"><div class="fl" style="width:45%"></div></div><div class="v">189</div></div>
+        <div class="row" title="한자 어휘 일력 책 소개 · 좋아요 151 · 댓글 58 — 최하위"><div class="l">책 소개 (정보만)</div><div class="tr"><div class="fl" style="width:36%"></div></div><div class="v">151</div></div>
+      </div>
+      <div class="ax"><div class="pad"></div><div class="sc"><span>0</span><span>105</span><span>210</span><span>315</span><span>420</span></div></div>
+    </div>
+  </section>
+
+  <!-- 03 -->
+  <section>
+    <h2><span class="no">03</span>반응이 좋았던 글의 공통점 3가지</h2>
+    <p class="lede">15개를 형식과 주제로 갈라 평균을 내보니, 세 가지 규칙이 또렷하게 드러났습니다.</p>
+
+    <div class="duo">
+      <div class="chart">
+        <p class="ch-t">형식별 평균 좋아요</p>
+        <p class="ch-s">릴스 4개 vs 사진·슬라이드 11개</p>
+        <div class="bars">
+          <div class="row hi" title="릴스 4개 평균 좋아요 295"><div class="l">릴스</div><div class="tr"><div class="fl" style="width:100%"></div></div><div class="v">295</div></div>
+          <div class="row" title="사진·슬라이드 11개 평균 좋아요 233"><div class="l">사진·슬라이드</div><div class="tr"><div class="fl" style="width:79%"></div></div><div class="v">233</div></div>
+        </div>
+        <div class="ax"><div class="pad" style="width:120px"></div><div class="sc"><span>0</span><span>150</span><span>300</span></div></div>
+      </div>
+      <div class="chart">
+        <p class="ch-t">형식별 평균 댓글</p>
+        <p class="ch-s">같은 15개를 댓글 기준으로 다시 봄</p>
+        <div class="bars">
+          <div class="row hi" title="릴스 4개 평균 댓글 149"><div class="l">릴스</div><div class="tr"><div class="fl" style="width:100%"></div></div><div class="v">149</div></div>
+          <div class="row" title="사진·슬라이드 평균 댓글 73"><div class="l">사진·슬라이드</div><div class="tr"><div class="fl" style="width:49%"></div></div><div class="v">73</div></div>
+        </div>
+        <div class="ax"><div class="pad" style="width:120px"></div><div class="sc"><span>0</span><span>75</span><span>150</span></div></div>
+      </div>
+    </div>
+    <p class="cap">좋아요는 1.3배 차이지만 <b>댓글은 2배</b> 차이입니다. 릴스가 대화를 훨씬 많이 만듭니다.</p>
+
+    <div class="chart">
+      <p class="ch-t">주제별 평균 댓글</p>
+      <p class="ch-s">15개를 세 갈래로 나눠 평균을 냈습니다.</p>
+      <div class="bars">
+        <div class="row hi" title="서평단·이벤트 6개 평균 댓글 122"><div class="l">서평단 · 이벤트</div><div class="tr"><div class="fl" style="width:100%"></div></div><div class="v">122</div></div>
+        <div class="row" title="책 소개 7개 평균 댓글 74"><div class="l">그냥 책 소개</div><div class="tr"><div class="fl" style="width:61%"></div></div><div class="v">74</div></div>
+        <div class="row" title="책탑·완독 기록 2개 평균 댓글 72 (1개는 댓글 꺼둠)"><div class="l">기록 모음</div><div class="tr"><div class="fl" style="width:59%"></div></div><div class="v">72</div></div>
+      </div>
+      <div class="ax"><div class="pad"></div><div class="sc"><span>0</span><span>40</span><span>80</span><span>120</span></div></div>
+    </div>
+
+    <div class="rules">
+      <div class="rule">
+        <div class="tagno">공식 01</div>
+        <h4>댓글을 달아야 할 ‘이유’를 만든다</h4>
+        <p>댓글 상위 4개가 전부 <b>서평단·이벤트 모집 릴스</b>입니다. “읽고 싶은 분 댓글 남겨주세요”처럼 <b>댓글이 신청서 역할</b>을 합니다. 읽는 사람 입장에서 댓글을 달 이유가 생기니 안 달 수가 없습니다.</p>
+        <div class="proof">서평단·이벤트 평균 댓글 <b>122</b> · 그냥 책 소개 <b>74</b> — 1.6배</div>
+      </div>
+      <div class="rule">
+        <div class="tagno">공식 02</div>
+        <h4>낱개보다 ‘모아서’ 보여준다</h4>
+        <p>좋아요 2위(370)는 <b>8월에 읽은 책 19권을 한 줄씩 정리한 글</b>, 3위(277)는 <b>이번 주 받은 책을 쌓아 찍은 사진</b>입니다. 책 한 권을 소개한 글들(평균 218)보다 훨씬 높습니다. 쌓인 것을 보여주면 사람들이 멈춰 섭니다.</p>
+        <div class="proof">기록 모음 평균 좋아요 <b>324</b> · 개별 책 소개 <b>218</b> — 1.5배</div>
+      </div>
+      <div class="rule">
+        <div class="tagno">공식 03</div>
+        <h4>책 이야기에 ‘내 이야기’를 붙인다</h4>
+        <p>10위 글(좋아요 228)은 소설 소개인데 댓글이 <b>101개</b>나 달렸습니다. 이유는 “<b>아들이 표지를 보고 놀랐다</b>”는 자기 집 이야기를 붙였기 때문입니다. 댓글창이 “저희 집도요”로 이어집니다. 반대로 정보만 담은 한자 어휘 일력 글은 <b>15개 중 꼴찌</b>였습니다.</p>
+        <div class="proof">내 이야기 붙인 글 댓글 <b>101</b> · 정보만 담은 글 <b>58</b> — 1.7배</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 -->
+  <section>
+    <h2><span class="no">04</span>이 계정이 안 하고 있는 것</h2>
+    <p class="lede">따라만 하면 늘 뒤에 섭니다. 이 계정이 비워둔 자리가 내 자리입니다.</p>
+    <ul class="gaps">
+      <li><span class="mk">빈틈 1</span><span><b>시니어 독자가 없습니다.</b> 모든 글이 ‘사춘기 아들 키우는 40대 엄마’ 시점입니다. 70대가 읽고 쓰는 이야기는 이 분야 어디에도 없습니다.</span></li>
+      <li><span class="mk">빈틈 2</span><span><b>필사 ‘하는 법’을 안 가르칩니다.</b> 필사모임을 운영하면서도, 어떤 펜으로 어떻게 쓰는지 보여주는 글은 15개 중 한 개도 없었습니다.</span></li>
+      <li><span class="mk">빈틈 3</span><span><b>전부 신간입니다.</b> 출판사 서평단 구조라 새 책만 다룹니다. 오래 읽어온 책, 다시 읽는 책 이야기가 통째로 비어 있습니다.</span></li>
+      <li><span class="mk">빈틈 4</span><span><b>AI 이야기가 하나도 없습니다.</b> 읽고 쓰는 사람들이 가장 궁금해하는 주제인데, 이 계정은 손도 대지 않았습니다.</span></li>
+    </ul>
+  </section>
+
+  <!-- 05 -->
+  <section>
+    <h2><span class="no">05</span>내 콘텐츠 기획안 3개</h2>
+    <p class="lede">위의 공식 3가지를 하나씩 가져와, 이 계정이 비워둔 자리에 놓았습니다. 각 기획안은 <b>공식 하나 + 빈틈 하나</b>의 조합입니다.</p>
+
+    <div class="plans">
+
+      <!-- 기획안 1 -->
+      <article class="plan">
+        <div class="plan-h">
+          <div class="no">기획안 01 · 공식 02(모아 보여주기) + 빈틈 1(시니어)</div>
+          <div class="name">일흔둘의 한 달 서가</div>
+          <p class="one">한 달 동안 읽은 책을 한 권당 한 줄로 정리해 매달 말 올리는 월간 기록</p>
+        </div>
+        <div class="plan-b">
+          <dl class="spec">
+            <dt>형식</dt><dd><b>슬라이드 10장</b> (표지 1장 + 책 8장 + 마무리 1장)</dd>
+            <dt>주기</dt><dd>매달 마지막 주 <b>일요일 아침 8시</b> — 한 달에 한 번</dd>
+            <dt>준비 시간</dt><dd>월 2시간 (읽을 때마다 한 줄씩 메모해두면 30분)</dd>
+          </dl>
+
+          <p class="firstline">1954년생이 8월에 읽은 책 여덟 권</p>
+
+          <div class="slidebox">
+            <div class="h">슬라이드 구성</div>
+            <ol>
+              <li><b>1장</b> — 위 문구만 크게. 배경은 책상 위 책 사진</li>
+              <li><b>2~9장</b> — 책 한 권씩. 표지 사진 + 제목 + <b>한 줄 감상</b>만. 줄거리 설명 금지</li>
+              <li><b>10장</b> — “9월엔 뭘 읽을까요? 추천 받습니다” — 댓글 유도</li>
+            </ol>
+          </div>
+
+          <div class="tags">#일흔둘의서가 #한달독서기록 #시니어독서 #북스타그램 #한권한줄 #1954년생</div>
+
+          <div class="why"><span class="lab">왜 될까</span>
+            벤치마킹 계정에서 <b>‘한 달 모아 보여주기’ 글이 좋아요 370으로 2위</b>였습니다. 개별 책 소개(평균 218)보다 1.5배입니다. 여기에 <b>‘1954년생’이라는 나이</b>가 붙습니다. 이 분야에 없는 정보라 스크롤이 멈춥니다.</div>
+        </div>
+      </article>
+
+      <!-- 기획안 2 -->
+      <article class="plan">
+        <div class="plan-h">
+          <div class="no">기획안 02 · 공식 03(내 이야기) + 빈틈 4(AI)</div>
+          <div class="name">AI에게 물어본 문장</div>
+          <p class="one">손으로 옮겨 적은 문장 하나를 AI에게 묻고, 그 대화를 그대로 보여주는 주간 연재</p>
+        </div>
+        <div class="plan-b">
+          <dl class="spec">
+            <dt>형식</dt><dd><b>슬라이드 5장</b> — 손글씨 사진 + AI 대화 화면 캡처</dd>
+            <dt>주기</dt><dd>매주 <b>수요일 저녁 8시</b></dd>
+            <dt>준비 시간</dt><dd>회당 40분 (필사 15분 + 질문 10분 + 정리 15분)</dd>
+          </dl>
+
+          <p class="firstline">“이 문장이 무슨 뜻이냐” 물었더니<br>AI가 이렇게 답했습니다</p>
+
+          <div class="slidebox">
+            <div class="h">슬라이드 구성</div>
+            <ol>
+              <li><b>1장</b> — 손으로 적은 문장 사진. <b>손이 함께 나오게</b> 찍기</li>
+              <li><b>2장</b> — 내가 AI에게 던진 질문 화면 캡처</li>
+              <li><b>3장</b> — AI의 답 중 <b>가장 뜻밖이었던 한 대목</b>만 잘라서</li>
+              <li><b>4장</b> — “나는 이렇게 생각한다” — AI와 다른 내 의견을 반드시 넣기</li>
+              <li><b>5장</b> — “여러분은 이 문장, 어떻게 읽으셨어요?”</li>
+            </ol>
+          </div>
+
+          <div class="tags">#AI에게물어본문장 #필사 #손글씨 #시니어가AI쓰는법 #책글귀 #읽고쓰는사람</div>
+
+          <div class="why"><span class="lab">왜 될까</span>
+            정보만 담은 글은 <b>15개 중 꼴찌(151)</b>였고, 자기 집 이야기를 붙인 글은 <b>댓글 101개</b>였습니다. AI와 나눈 대화는 세상에 하나뿐인 ‘내 이야기’입니다. 게다가 <b>72세가 AI에게 묻는 장면</b>은 이 분야 어느 계정도 보여주지 않고 있습니다.</div>
+        </div>
+      </article>
+
+      <!-- 기획안 3 -->
+      <article class="plan">
+        <div class="plan-h">
+          <div class="no">기획안 03 · 공식 01(참여 이유) + 빈틈 2(필사 방법)</div>
+          <div class="name">오늘 한 문장, 같이 씁시다</div>
+          <p class="one">문장 하나를 쓰는 손을 30초 영상으로 보여주고, 따라 쓴 사람을 댓글로 모으는 참여형 릴스</p>
+        </div>
+        <div class="plan-b">
+          <dl class="spec">
+            <dt>형식</dt><dd><b>릴스 25~30초</b> — 종이와 펜, 쓰는 손만 위에서 촬영</dd>
+            <dt>주기</dt><dd><b>격주 토요일 오전 10시</b> — 주말에 시간 내기 좋음</dd>
+            <dt>준비 시간</dt><dd>회당 50분 (촬영 20분 + 자막 30분)</dd>
+          </dl>
+
+          <p class="firstline">오늘 이 문장, 같이 써보실래요?<br>다 쓰시면 댓글에 ✍️ 하나만 남겨주세요</p>
+
+          <div class="slidebox">
+            <div class="h">영상 구성</div>
+            <ol>
+              <li><b>0~3초</b> — 빈 종이와 펜만. 자막 “오늘의 한 문장”</li>
+              <li><b>3~22초</b> — 문장을 처음부터 끝까지 쓰는 손. <b>말소리 없이</b> 펜 소리만</li>
+              <li><b>22~30초</b> — 완성된 글씨를 천천히 비추며 자막 “같이 쓰실 분?”</li>
+              <li><b>캡션</b> — 문장 출처(책 제목·지은이) + 위 문구로 마무리</li>
+            </ol>
+          </div>
+
+          <div class="tags">#오늘한문장 #같이필사해요 #필사챌린지 #손글씨 #펜글씨 #책속의한줄</div>
+
+          <div class="why"><span class="lab">왜 될까</span>
+            댓글이 가장 많이 달린 상위 4개가 <b>전부 댓글로 신청받는 릴스</b>였습니다. 릴스 평균 댓글은 <b>149개</b>로 사진(73개)의 2배입니다. 여기에 벤치마킹 계정이 <b>15개 중 한 번도 보여주지 않은 ‘쓰는 손’</b>을 넣습니다. 필사 계정을 운영하면서도 정작 필사 장면이 없다는 것이 이 계정의 가장 큰 빈틈입니다.</div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- 06 -->
+  <section>
+    <h2><span class="no">06</span>첫 달, 이렇게 시작하면 됩니다</h2>
+    <p class="lede">세 가지를 한꺼번에 시작하면 지칩니다. 한 달에 <b>총 5개</b>만 올립니다.</p>
+    <div class="weeks">
+      <div class="week"><span class="w">1주차</span><span class="d"><b>「AI에게 물어본 문장」 1회</b> — 가장 손이 덜 갑니다. 이걸로 감을 잡습니다</span></div>
+      <div class="week"><span class="w">2주차</span><span class="d"><b>「AI에게 물어본 문장」 2회</b> + <b>「같이 씁시다」 릴스 1회</b> — 영상은 이때 처음 도전</span></div>
+      <div class="week"><span class="w">3주차</span><span class="d"><b>「AI에게 물어본 문장」 3회</b> — 앞의 두 편 중 반응 좋았던 쪽으로 방향을 잡습니다</span></div>
+      <div class="week"><span class="w">4주차</span><span class="d"><b>「일흔둘의 한 달 서가」 1회</b> — 한 달치가 쌓였으니 이제 만들 수 있습니다</span></div>
+      <div class="week"><span class="w">한 달 뒤</span><span class="d">좋아요·댓글을 적어두고 <b>가장 반응 좋은 하나만 남겨</b> 집중합니다. 셋 다 붙들지 않습니다</span></div>
+    </div>
+  </section>
+
+  <!-- 07 -->
+  <section>
+    <h2><span class="no">07</span>어떻게 조사했나</h2>
+    <div class="method">
+      <h4>방법</h4>
+      <p>로그인한 브라우저에서 @yozo_anne 프로필을 열고, 최근 게시물 <b>15개</b>의 주소를 모았습니다. 그다음 게시물을 <b>하나씩 열어</b> 좋아요·댓글·리포스트 수와 날짜를 화면에서 직접 읽었습니다. 게시물 사이에 <b>6.5초씩 쉬었습니다.</b></p>
+      <p>글 내용은 프로필 화면의 사진 설명(<code>alt</code>)에 들어 있는 원문을 그대로 가져왔습니다.</p>
+
+      <h4>시행착오</h4>
+      <p>처음에는 인스타그램 데이터 주소로 한 번에 여러 개를 요청했다가 <b>차단(429)</b>당했습니다. 퀘스트 안내대로 “천천히, 15개만”이 맞았습니다. 게시물을 <code>iframe</code>으로 여는 방법도 인스타그램이 막아두어 실패했고, 결국 <b>새 창으로 하나씩 여는 방법</b>으로 성공했습니다.</p>
+
+      <h4>한계</h4>
+      <p>좋아요·댓글 수는 <b>2026년 9월 7일 시점</b>입니다. 최근 글일수록 숫자가 더 오를 수 있어, 1~2일 된 글은 다소 불리하게 잡혀 있습니다.</p>
+      <p>조회 수와 저장 수는 계정 주인만 볼 수 있어 이 분석에 넣지 못했습니다. 실제로는 저장 수가 더 중요한 지표일 수 있습니다.</p>
+      <p>15개는 2주치입니다. 계절이나 시기에 따른 차이는 담기지 않았습니다.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p>필사 계정 벤치마킹 기획안 · 조사일 2026년 9월 7일</p>
+    <p>분석 대상 @yozo_anne (팔로워 7,618) · 게시물 15개 · 2026.08.23 ~ 09.06</p>
+  </footer>
+
+</div>
