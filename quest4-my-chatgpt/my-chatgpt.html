@@ -1,0 +1,509 @@
+<title>사서 김목록 상담실</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hahmlet:wght@400;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+
+<style>
+:root{
+  --desk:#E7E2D5;
+  --card:#FBF8F0;
+  --card-2:#F2EDDF;
+  --ink:#221F19;
+  --ink-2:#5C574B;
+  --ink-3:#8B8574;
+  --line:#DCD3BC;
+  --line-2:#C3B896;
+  --rule:#B33A3A;
+  --green:#1E6B4E;
+  --green-soft:#E0EDE6;
+  --shadow:0 1px 2px rgba(34,31,25,.06), 0 10px 26px -18px rgba(34,31,25,.4);
+
+  --f-disp:"Hahmlet","Batang",serif;
+  --f-body:"Noto Sans KR","Malgun Gothic",sans-serif;
+  --f-mono:"Nanum Gothic Coding","D2Coding",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --desk:#1A1815; --card:#23201B; --card-2:#2B2721;
+    --ink:#EDE7D9; --ink-2:#B4AC99; --ink-3:#8A8271;
+    --line:#3A342A; --line-2:#4C4536;
+    --rule:#D9736E; --green:#4FB08A; --green-soft:#1B2E26;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --desk:#1A1815; --card:#23201B; --card-2:#2B2721;
+  --ink:#EDE7D9; --ink-2:#B4AC99; --ink-3:#8A8271;
+  --line:#3A342A; --line-2:#4C4536;
+  --rule:#D9736E; --green:#4FB08A; --green-soft:#1B2E26;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -18px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{background:var(--desk);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:26px 20px 60px}
+
+/* 머리말 */
+header.top{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;justify-content:space-between;padding-bottom:16px;border-bottom:2px solid var(--line-2)}
+.brand h1{font-family:var(--f-disp);font-weight:700;font-size:clamp(24px,3.4vw,34px);margin:0;letter-spacing:-.01em}
+.brand p{margin:6px 0 0;color:var(--ink-2);font-size:14.5px}
+.status{display:flex;align-items:center;gap:9px;font-family:var(--f-mono);font-size:12.5px;color:var(--ink-2);
+  background:var(--card);border:1px solid var(--line);padding:7px 13px;white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ink-3);flex:none}
+.dot.ok{background:var(--green)}
+.dot.warn{background:var(--rule)}
+
+/* 본체 2단 */
+.grid{display:grid;grid-template-columns:340px 1fr;gap:22px;margin-top:24px;align-items:start}
+@media (max-width:880px){.grid{grid-template-columns:1fr}}
+
+/* 목록카드 = 프로필 */
+.catalog{background:var(--card);border:1px solid var(--line-2);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.catalog::before{content:"";position:absolute;top:44px;left:0;right:0;height:1px;background:var(--rule);opacity:.55}
+.cat-head{padding:14px 20px 16px;border-bottom:1px solid var(--line)}
+.cat-head .sig{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.14em;color:var(--rule);font-weight:700}
+.cat-head h2{font-family:var(--f-disp);font-weight:700;font-size:19px;margin:8px 0 0}
+.cat-body{padding:18px 20px 20px}
+.fld{margin-bottom:16px}
+.fld label{display:block;font-family:var(--f-mono);font-size:11.5px;letter-spacing:.1em;color:var(--ink-3);margin-bottom:6px}
+.fld input,.fld textarea{
+  width:100%;background:var(--card-2);color:var(--ink);border:1px solid var(--line);
+  padding:9px 11px;font-family:var(--f-body);font-size:14.5px;line-height:1.6;border-radius:2px;resize:vertical;
+}
+.fld input:focus,.fld textarea:focus{outline:2px solid var(--green);outline-offset:1px;border-color:var(--green)}
+.cat-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:4px}
+button{font-family:var(--f-body);font-size:14px;cursor:pointer;border-radius:2px;border:1px solid var(--line-2);
+  background:var(--card-2);color:var(--ink);padding:8px 14px;transition:background .12s}
+button:hover{background:var(--line)}
+button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+button.primary{background:var(--green);border-color:var(--green);color:#fff;font-weight:500}
+button.primary:hover{filter:brightness(1.1)}
+button.primary:disabled{opacity:.5;cursor:not-allowed;filter:none}
+button.ghost{background:transparent}
+
+details.peek{margin-top:16px;border-top:1px dashed var(--line-2);padding-top:14px}
+details.peek summary{font-family:var(--f-mono);font-size:12px;color:var(--ink-2);cursor:pointer;list-style:none}
+details.peek summary::-webkit-details-marker{display:none}
+details.peek summary::before{content:"▸ ";color:var(--rule)}
+details.peek[open] summary::before{content:"▾ "}
+details.peek pre{
+  margin:12px 0 0;background:var(--card-2);border:1px solid var(--line);padding:12px;
+  font-family:var(--f-mono);font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:var(--ink-2);
+  max-height:230px;overflow:auto;
+}
+
+/* 채팅 */
+.chat{background:var(--card);border:1px solid var(--line-2);box-shadow:var(--shadow);display:flex;flex-direction:column;min-height:560px}
+.chat-head{padding:13px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--card-2)}
+.chat-head .who{font-family:var(--f-disp);font-weight:600;font-size:16px}
+.chat-head .cnt{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3)}
+.log{flex:1;overflow-y:auto;padding:22px 20px;display:flex;flex-direction:column;gap:16px;max-height:56vh}
+.msg{display:flex;gap:11px;max-width:88%}
+.msg .av{width:30px;height:30px;flex:none;border-radius:50%;display:grid;place-items:center;
+  font-family:var(--f-mono);font-size:11px;font-weight:700;border:1px solid var(--line-2)}
+.msg.ai .av{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+.msg.me{align-self:flex-end;flex-direction:row-reverse}
+.msg.me .av{background:var(--card-2);color:var(--ink-2)}
+.bub{padding:11px 15px;border:1px solid var(--line);background:var(--card-2);border-radius:2px;white-space:pre-wrap;word-break:break-word;font-size:15.5px;line-height:1.75}
+.msg.ai .bub{background:var(--card);border-left:3px solid var(--green)}
+.msg.me .bub{background:var(--green-soft);border-right:3px solid var(--green)}
+.msg .time{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3);margin-top:5px;display:block}
+.msg.err .bub{border-left-color:var(--rule);color:var(--ink-2)}
+.typing{font-family:var(--f-mono);font-size:13px;color:var(--ink-3)}
+
+.starters{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px 16px}
+.starters button{font-size:13.5px;padding:6px 12px;color:var(--ink-2)}
+
+.compose{border-top:1px solid var(--line);padding:14px 20px 18px;display:flex;gap:10px;align-items:flex-end;background:var(--card-2)}
+.compose textarea{flex:1;background:var(--card);color:var(--ink);border:1px solid var(--line-2);padding:11px 13px;
+  font-family:var(--f-body);font-size:15.5px;line-height:1.6;resize:none;min-height:48px;max-height:150px;border-radius:2px}
+.compose textarea:focus{outline:2px solid var(--green);outline-offset:1px}
+.hint{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);padding:0 20px 14px;margin:-6px 0 0}
+
+/* 열쇠 입력 */
+.keybox{background:var(--card);border:1px solid var(--rule);padding:18px 20px;margin-top:22px}
+.keybox h3{font-family:var(--f-disp);font-weight:700;font-size:16px;margin:0 0 8px}
+.keybox p{margin:0 0 12px;font-size:14.5px;color:var(--ink-2)}
+.keybox .rowin{display:flex;gap:9px;flex-wrap:wrap}
+.keybox input{flex:1;min-width:220px;background:var(--card-2);color:var(--ink);border:1px solid var(--line);
+  padding:9px 11px;font-family:var(--f-mono);font-size:13px;border-radius:2px}
+.keybox small{display:block;margin-top:10px;font-size:12.5px;color:var(--ink-3);line-height:1.6}
+
+footer{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);line-height:1.8}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <h1>사서 김목록 상담실</h1>
+      <p>성격을 정해준 나만의 AI와 이야기하는 곳입니다. 왼쪽 카드를 고치면 말투가 바뀝니다.</p>
+    </div>
+    <div class="status" id="status"><span class="dot" id="dot"></span><span id="statusText">연결 확인 중…</span></div>
+  </header>
+
+  <div class="grid">
+
+    <!-- 목록카드: AI 프로필 -->
+    <aside class="catalog">
+      <div class="cat-head">
+        <div class="sig">AI PROFILE · 등록번호 KR-1954</div>
+        <h2>AI 인물 카드</h2>
+      </div>
+      <div class="cat-body">
+        <div class="fld">
+          <label for="pName">이름</label>
+          <input id="pName" type="text" value="김목록">
+        </div>
+        <div class="fld">
+          <label for="pJob">전문분야</label>
+          <textarea id="pJob" rows="3">동네 공공도서관에서 40년 일한 사서. 한국 문학과 역사서에 특히 밝고, 절판된 책을 찾아내는 일을 잘한다. 어떤 주제든 관련 책 한 권은 반드시 떠올린다.</textarea>
+        </div>
+        <div class="fld">
+          <label for="pTone">말투</label>
+          <textarea id="pTone" rows="3">늘 존댓말. 문장이 짧고 군더더기가 없다. 감탄사나 이모지를 쓰지 않는다. 답을 세 문단 안에 끝낸다.</textarea>
+        </div>
+        <div class="fld">
+          <label for="pChar">성격 · 버릇</label>
+          <textarea id="pChar" rows="4">서두르지 않고, 모르는 것은 모른다고 말한다. 상대를 가르치려 들지 않는다. 대답 끝에는 반드시 "함께 읽으면 좋을 책"이라는 줄을 두고 책 한 권을 제목·지은이와 함께 추천한다. 추천할 책이 마땅치 않으면 그렇게 말한다.</textarea>
+        </div>
+
+        <div class="cat-actions">
+          <button class="primary" id="saveProfile">인물 카드 저장</button>
+          <button class="ghost" id="resetProfile">처음 설정으로</button>
+        </div>
+
+        <details class="peek">
+          <summary>AI에게 실제로 전달되는 글 보기</summary>
+          <pre id="promptPeek"></pre>
+        </details>
+      </div>
+    </aside>
+
+    <!-- 채팅 -->
+    <section class="chat">
+      <div class="chat-head">
+        <span class="who" id="chatWho">김목록 사서</span>
+        <span class="cnt" id="turnCount">주고받은 말 0</span>
+      </div>
+
+      <div class="log" id="log" aria-live="polite"></div>
+
+      <div class="starters" id="starters">
+        <button data-q="요즘 잠이 잘 안 옵니다.">요즘 잠이 잘 안 옵니다</button>
+        <button data-q="일흔이 넘어 글을 쓰기 시작하려면 무엇부터 하면 좋을까요?">글쓰기를 시작하려면?</button>
+        <button data-q="손주에게 읽어줄 만한 옛날 이야기책을 추천해 주세요.">손주에게 읽어줄 책</button>
+      </div>
+
+      <div class="compose">
+        <textarea id="input" rows="1" placeholder="사서에게 물어보세요.  (Enter 보내기 · Shift+Enter 줄바꿈)"></textarea>
+        <button class="primary" id="send">보내기</button>
+        <button class="ghost" id="clear" title="대화 기록 지우기">지우기</button>
+      </div>
+      <p class="hint" id="hint"></p>
+    </section>
+  </div>
+
+  <!-- 열쇠(API 키) 입력 — 필요한 경우에만 보임 -->
+  <div class="keybox" id="keybox" hidden>
+    <h3>AI와 연결하려면 열쇠가 하나 필요합니다</h3>
+    <p>이 페이지를 <b>클로드 화면 안에서</b> 열면 열쇠 없이 바로 됩니다. 지금처럼 <b>다른 곳에서</b> 열었을 때는, Anthropic에서 받은 API 키를 넣어주셔야 AI가 답할 수 있습니다.</p>
+    <div class="rowin">
+      <input id="apiKey" type="password" placeholder="sk-ant-... 로 시작하는 키를 붙여넣으세요" autocomplete="off">
+      <button class="primary" id="saveKey">열쇠 넣기</button>
+      <button class="ghost" id="dropKey">열쇠 지우기</button>
+    </div>
+    <small>열쇠는 <b>이 브라우저 안에만</b> 저장되고 어디로도 보내지 않습니다. GitHub에 올라가는 파일에도 들어가지 않습니다. 남의 컴퓨터에서는 넣지 마세요.</small>
+  </div>
+
+  <footer>
+    <div>퀘스트 4 · My ChatGPT — AI 프로필 설정 + 네트워크 호출 + 대화 기록 쌓기</div>
+    <div>모델 claude-opus-5 · 대화와 인물 카드는 이 브라우저에만 저장됩니다</div>
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  const $ = (id) => document.getElementById(id);
+  const LS = { prof:"kimmokrok.profile.v1", chat:"kimmokrok.chat.v1", key:"kimmokrok.key.v1" };
+
+  const DEFAULT_PROFILE = {
+    name: "김목록",
+    job: "동네 공공도서관에서 40년 일한 사서. 한국 문학과 역사서에 특히 밝고, 절판된 책을 찾아내는 일을 잘한다. 어떤 주제든 관련 책 한 권은 반드시 떠올린다.",
+    tone: "늘 존댓말. 문장이 짧고 군더더기가 없다. 감탄사나 이모지를 쓰지 않는다. 답을 세 문단 안에 끝낸다.",
+    character: "서두르지 않고, 모르는 것은 모른다고 말한다. 상대를 가르치려 들지 않는다. 대답 끝에는 반드시 \"함께 읽으면 좋을 책\"이라는 줄을 두고 책 한 권을 제목·지은이와 함께 추천한다. 추천할 책이 마땅치 않으면 그렇게 말한다."
+  };
+
+  const GREETING = "어서 오세요. 김목록입니다.\n\n무엇이든 물어보세요. 책 이야기가 아니어도 괜찮습니다. 듣고 나서, 도움이 될 만한 책이 있으면 한 권 알려드리겠습니다.";
+
+  // ── 저장소 (실패해도 페이지는 그대로 동작) ──────────────────
+  const store = {
+    get(k, fallback) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch { return fallback; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+    del(k) { try { localStorage.removeItem(k); } catch {} }
+  };
+
+  let profile = Object.assign({}, DEFAULT_PROFILE, store.get(LS.prof, {}));
+  let history = store.get(LS.chat, []);          // [{role:'me'|'ai', text, at}]
+  let sampleFn = null;                            // claude.use("sample")
+  let apiKey = store.get(LS.key, "");
+  let busy = false;
+
+  // ── AI에게 보낼 인물 설정문 만들기 ──────────────────────────
+  function personaText() {
+    return [
+      `당신은 "${profile.name}"입니다. 아래 설정을 벗어나지 마세요.`,
+      ``,
+      `[전문분야]`, profile.job,
+      ``,
+      `[말투]`, profile.tone,
+      ``,
+      `[성격과 버릇]`, profile.character,
+      ``,
+      `[지켜야 할 것]`,
+      `- 한국어로 답합니다.`,
+      `- 자신이 인공지능이라는 말은 먼저 꺼내지 않습니다. 다만 물으면 숨기지 않습니다.`,
+      `- 확실하지 않은 사실은 지어내지 않고, 확실하지 않다고 밝힙니다.`,
+      `- 실제로 있는 책만 추천합니다. 제목이나 지은이가 기억나지 않으면 그렇게 말합니다.`,
+      `- 의료·법률·투자 판단이 필요한 질문에는 전문가와 상의하라고 덧붙입니다.`
+    ].join("\n");
+  }
+
+  function renderPeek(){ $("promptPeek").textContent = personaText(); }
+
+  // ── 화면 그리기 ────────────────────────────────────────────
+  function esc(s){ return String(s); }
+  function hhmm(ts){ const d = new Date(ts); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0"); }
+
+  function bubble(role, text, at, kind) {
+    const wrap = document.createElement("div");
+    wrap.className = "msg " + (role === "me" ? "me" : "ai") + (kind === "err" ? " err" : "");
+    const av = document.createElement("div");
+    av.className = "av";
+    av.textContent = role === "me" ? "나" : (profile.name || "AI").slice(0,1);
+    const col = document.createElement("div");
+    const b = document.createElement("div");
+    b.className = "bub";
+    b.textContent = esc(text);
+    col.appendChild(b);
+    if (at) { const t = document.createElement("span"); t.className = "time"; t.textContent = hhmm(at); col.appendChild(t); }
+    wrap.appendChild(av); wrap.appendChild(col);
+    return { wrap, body: b };
+  }
+
+  function render() {
+    const log = $("log");
+    log.textContent = "";
+    if (!history.length) {
+      log.appendChild(bubble("ai", GREETING, null).wrap);
+    } else {
+      for (const m of history) log.appendChild(bubble(m.role, m.text, m.at).wrap);
+    }
+    log.scrollTop = log.scrollHeight;
+    $("turnCount").textContent = "주고받은 말 " + history.length;
+    $("chatWho").textContent = (profile.name || "AI") + " 사서";
+    $("starters").hidden = history.length > 0;
+  }
+
+  function setStatus(kind, text, hint) {
+    $("dot").className = "dot " + (kind || "");
+    $("statusText").textContent = text;
+    $("hint").textContent = hint || "";
+  }
+
+  // ── AI 부르기: ① 클로드 화면 안이면 sample, ② 아니면 API 키 ──
+  async function askClaude(turns, onDelta, signal) {
+    if (sampleFn) {
+      const res = await sampleFn(turns, {
+        cache: false,                       // 대화는 매번 새로 물어야 함
+        modelTier: "default",
+        signal,
+        onText: ({ text }) => onDelta(text) // text = 지금까지의 답 전체
+      });
+      return res.text;
+    }
+    if (!apiKey) throw { code: "no_key", message: "열쇠가 없습니다." };
+
+    // 라이브러리 없이 브라우저에서 직접 호출 (Messages API)
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      signal,
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "anthropic-beta": "server-side-fallback-2026-07-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: "claude-opus-5",
+        max_tokens: 4096,
+        system: personaText(),
+        output_config: { effort: "low" },   // 잡담에 가까운 대화라 낮게
+        fallbacks: "default",               // 거절될 때 대신 답할 모델을 서버가 고름
+        messages: turns
+      })
+    });
+    if (!r.ok) {
+      let detail = "";
+      try { detail = (await r.json())?.error?.message || ""; } catch {}
+      throw { code: "http_" + r.status, message: detail || ("서버가 " + r.status + " 를 돌려줬습니다.") };
+    }
+    const data = await r.json();
+    if (data.stop_reason === "refusal") throw { code: "refusal", message: "이 질문에는 답하지 않기로 했습니다. 다른 표현으로 물어봐 주세요." };
+    const text = (data.content || []).filter(b => b.type === "text").map(b => b.text).join("").trim();
+    onDelta(text);
+    return text;
+  }
+
+  // 대화 기록 → AI가 알아듣는 형식으로. 첫 마디에 인물 설정을 붙인다.
+  function buildTurns() {
+    const turns = history.map(m => ({ role: m.role === "me" ? "user" : "assistant", content: m.text }));
+    if (sampleFn && turns.length && turns[0].role === "user") {
+      // sample 방식에는 system 자리가 없어서 첫 마디에 설정을 함께 넣는다
+      turns[0] = { role: "user", content: personaText() + "\n\n---\n\n아래부터 방문자와의 대화입니다.\n\n" + turns[0].content };
+    }
+    return turns;
+  }
+
+  const ERRMSG = {
+    not_granted: "AI에게 물어볼 권한이 없습니다. 페이지를 새로 고친 뒤 나오는 허용 창에서 \"허용\"을 눌러주세요.",
+    rate_limited: "너무 자주 물었습니다. 잠시 쉬었다가 다시 보내주세요.",
+    cancelled: "보내다가 중단했습니다.",
+    no_key: "AI와 연결할 열쇠가 없습니다. 아래 칸에 API 키를 넣어주세요.",
+    refusal: "이 질문에는 답하지 않기로 했습니다. 다른 표현으로 물어봐 주세요.",
+    http_401: "열쇠가 올바르지 않습니다. 다시 확인해 주세요.",
+    http_429: "너무 자주 물었습니다. 잠시 뒤에 다시 보내주세요."
+  };
+
+  async function send(textRaw) {
+    const text = (textRaw ?? $("input").value).trim();
+    if (!text || busy) return;
+
+    busy = true;
+    $("send").disabled = true;
+    $("input").value = "";
+
+    history.push({ role: "me", text, at: Date.now() });
+    store.set(LS.chat, history);
+    render();
+
+    const log = $("log");
+    const { wrap, body } = bubble("ai", "", null);
+    body.innerHTML = '<span class="typing">사서가 서가를 살펴보는 중…</span>';
+    log.appendChild(wrap);
+    log.scrollTop = log.scrollHeight;
+
+    let answer = "";
+    try {
+      answer = await askClaude(buildTurns(), (t) => {
+        answer = t;
+        body.textContent = t;
+        log.scrollTop = log.scrollHeight;
+      });
+      if (!answer) throw { code: "empty", message: "빈 답이 왔습니다." };
+      history.push({ role: "ai", text: answer, at: Date.now() });
+      store.set(LS.chat, history);
+      render();
+    } catch (e) {
+      const code = e && e.code ? e.code : "unknown";
+      const msg = ERRMSG[code] || (e && e.message) || "알 수 없는 문제가 생겼습니다.";
+      if (e && e.text) {                                   // 도중까지 온 답은 살린다
+        history.push({ role: "ai", text: e.text, at: Date.now() });
+        store.set(LS.chat, history);
+      }
+      render();
+      const err = bubble("ai", "⚠ " + msg, Date.now(), "err");
+      $("log").appendChild(err.wrap);
+      $("log").scrollTop = $("log").scrollHeight;
+      if (code === "no_key" || code === "http_401") $("keybox").hidden = false;
+    } finally {
+      busy = false;
+      $("send").disabled = false;
+      $("input").focus();
+    }
+  }
+
+  // ── 이벤트 ────────────────────────────────────────────────
+  const profFields = { name:"pName", job:"pJob", tone:"pTone", character:"pChar" };
+  function fillProfileInputs(){ for (const k in profFields) $(profFields[k]).value = profile[k]; }
+  function readProfileInputs(){ for (const k in profFields) profile[k] = $(profFields[k]).value.trim(); }
+
+  $("saveProfile").addEventListener("click", () => {
+    readProfileInputs();
+    store.set(LS.prof, profile);
+    renderPeek(); render();
+    const b = $("saveProfile"); const old = b.textContent;
+    b.textContent = "저장했습니다"; setTimeout(() => { b.textContent = old; }, 1400);
+  });
+
+  $("resetProfile").addEventListener("click", () => {
+    profile = Object.assign({}, DEFAULT_PROFILE);
+    store.set(LS.prof, profile);
+    fillProfileInputs(); renderPeek(); render();
+  });
+
+  for (const id in profFields) $(profFields[id]).addEventListener("input", () => { readProfileInputs(); renderPeek(); });
+
+  $("send").addEventListener("click", () => send());
+  $("input").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); }
+  });
+  $("input").addEventListener("input", (e) => {
+    e.target.style.height = "auto";
+    e.target.style.height = Math.min(e.target.scrollHeight, 150) + "px";
+  });
+
+  $("clear").addEventListener("click", () => {
+    if (history.length && !confirm("주고받은 말을 모두 지웁니다. 계속할까요?")) return;
+    history = []; store.del(LS.chat); render();
+  });
+
+  $("starters").addEventListener("click", (e) => {
+    const q = e.target.closest("button")?.dataset.q;
+    if (q) send(q);
+  });
+
+  $("saveKey").addEventListener("click", () => {
+    const v = $("apiKey").value.trim();
+    if (!v) return;
+    apiKey = v; store.set(LS.key, v); $("apiKey").value = "";
+    setStatus("ok", "열쇠로 연결됨", "이 브라우저에 저장된 열쇠로 AI를 부릅니다.");
+    $("keybox").hidden = true;
+  });
+  $("dropKey").addEventListener("click", () => {
+    apiKey = ""; store.del(LS.key);
+    setStatus("warn", "열쇠 없음", "AI를 부르려면 열쇠가 필요합니다.");
+  });
+
+  // ── 시작 ──────────────────────────────────────────────────
+  fillProfileInputs();
+  renderPeek();
+  render();
+  setStatus("", "연결 확인 중…", "");
+
+  // window.claude 는 클로드 화면 안에서만 있습니다. 없으면 열쇠 방식으로.
+  (async () => {
+    try {
+      if (window.claude && typeof window.claude.use === "function") {
+        sampleFn = await window.claude.use("sample");
+      }
+    } catch { sampleFn = null; }
+
+    if (sampleFn) {
+      setStatus("ok", "AI 연결됨", "열쇠 없이 바로 물어볼 수 있습니다. 처음 보낼 때 허용 창이 한 번 뜹니다.");
+      $("keybox").hidden = true;
+    } else if (apiKey) {
+      setStatus("ok", "열쇠로 연결됨", "이 브라우저에 저장된 열쇠로 AI를 부릅니다.");
+      $("keybox").hidden = true;
+    } else {
+      setStatus("warn", "열쇠 필요", "아래 칸에 API 키를 넣으면 AI가 답합니다.");
+      $("keybox").hidden = false;
+    }
+  })();
+})();
+</script>
