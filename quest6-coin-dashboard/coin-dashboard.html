@@ -162,6 +162,43 @@ button.small{font-size:13px;padding:6px 11px}
 .empty{text-align:center;color:var(--ink-3);padding:52px 20px;border:1px dashed var(--line-2);
   background:var(--panel);border-radius:6px;margin-top:22px}
 
+/* ── 기간별 그래프 패널 ───────────────────────────────── */
+.coin{cursor:pointer}
+.coin:hover{border-color:var(--line-2)}
+.coin .open{position:absolute;right:12px;bottom:11px;font-size:11px;color:var(--ink-3);
+  font-family:var(--f-body);pointer-events:none}
+
+.detail{background:var(--panel);border:1px solid var(--line-2);border-radius:6px;
+  box-shadow:var(--shadow);padding:20px 22px 22px;margin-top:22px}
+.detail-h{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin-bottom:16px}
+.detail-h img{width:38px;height:38px;border-radius:50%;flex:none;background:var(--panel-2)}
+.detail-h .who{flex:1;min-width:150px}
+.detail-h .who .ko{font-size:20px;font-weight:700;line-height:1.25}
+.detail-h .who .sym{font-family:var(--f-num);font-size:12px;color:var(--ink-3);letter-spacing:.06em}
+.periods{display:flex;gap:6px;flex-wrap:wrap}
+.periods button{font-size:13.5px;padding:7px 15px;border-radius:999px}
+.periods button[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);
+  color:#1A1508;font-weight:700}
+
+.dstats{display:flex;flex-wrap:wrap;gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:18px}
+.dstat{background:var(--panel);padding:11px 16px;flex:1;min-width:110px}
+.dstat .k{font-size:11.5px;color:var(--ink-3)}
+.dstat .v{font-family:var(--f-num);font-size:16px;font-weight:700;margin-top:1px;font-variant-numeric:tabular-nums}
+.dstat .v.up{color:var(--up)} .dstat .v.down{color:var(--down)}
+
+.dchart{position:relative;height:300px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px}
+.dchart svg{display:block;width:100%;height:300px}
+.dchart .msg{position:absolute;inset:0;display:grid;place-items:center;text-align:center;
+  color:var(--ink-3);font-size:14px;padding:20px;line-height:1.8}
+.gridline{stroke:var(--line);stroke-width:1}
+.axtext{fill:var(--ink-3);font-family:var(--f-num);font-size:11px}
+.cross{stroke:var(--ink-3);stroke-width:1;stroke-dasharray:3 3}
+.tip{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line-2);
+  border-radius:4px;padding:7px 11px;font-family:var(--f-num);font-size:12.5px;line-height:1.6;
+  box-shadow:var(--shadow);white-space:nowrap;transform:translate(-50%,-115%);z-index:5}
+.tip b{font-size:14px;display:block}
+.dnote{font-size:12.5px;color:var(--ink-3);margin:12px 0 0;line-height:1.7}
+
 footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
   font-family:var(--f-num);font-size:11px;color:var(--ink-3);line-height:1.9}
 
@@ -200,6 +237,18 @@ footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
     <span id="lastAt">아직 불러오지 않았습니다</span>
     <span id="errMsg" class="err"></span>
   </div>
+
+  <section class="detail" id="detail" hidden>
+    <div class="detail-h">
+      <img id="dImg" src="" alt="">
+      <div class="who"><div class="ko" id="dName">—</div><div class="sym" id="dSym"></div></div>
+      <div class="periods" id="periods"></div>
+      <button class="small" id="dClose">닫기</button>
+    </div>
+    <div class="dstats" id="dStats"></div>
+    <div class="dchart" id="dChart"><div class="msg">그래프를 불러오는 중입니다…</div></div>
+    <p class="dnote" id="dNote"></p>
+  </section>
 
   <div class="grid" id="grid"></div>
   <div class="empty" id="empty" hidden>담은 코인이 없습니다. 아래에서 코인을 골라 담아보세요.</div>
@@ -286,6 +335,181 @@ footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
       + '</svg>';
   }
 
+  // ══ 기간별 그래프 ══════════════════════════════════════
+  // CoinGecko 무료는 1년까지만 준다. 3년치는 업비트(원화)에서 받는다.
+  const upbit = new Map();                 // 기호 → {market, korean_name}
+  const PERIODS = [
+    { id:"7d", ko:"7일",   unit:"days",  count:7   },
+    { id:"1m", ko:"1개월", unit:"days",  count:30  },
+    { id:"1y", ko:"1년",   unit:"weeks", count:53  },
+    { id:"3y", ko:"3년",   unit:"weeks", count:157 }
+  ];
+  let openId = null, openPeriod = "3y";
+
+  async function loadUpbitMarkets() {
+    try {
+      const r = await fetch("https://api.upbit.com/v1/market/all");
+      if (!r.ok) return;
+      for (const m of await r.json()) {
+        if (m.market.startsWith("KRW-")) upbit.set(m.market.slice(4), m);
+      }
+      render();                            // 한국어 이름을 다시 입힌다
+    } catch {}
+  }
+
+  // 한국어 이름: 내 이름표 → 업비트 이름 → 영어 이름
+  const koName = (c) => KO[c.id] || upbit.get(c.symbol.toUpperCase())?.korean_name || c.name;
+
+  async function fetchCandles(symbol, period) {
+    const m = upbit.get(symbol.toUpperCase());
+    if (!m) throw new Error("no_upbit");
+    const url = "https://api.upbit.com/v1/candles/" + period.unit
+      + "?market=" + m.market + "&count=" + period.count;
+    const r = await fetch(url);
+    if (r.status === 429) throw new Error("busy");
+    if (!r.ok) throw new Error("http");
+    const rows = await r.json();
+    return rows.slice().reverse()
+      .map(c => ({ t: new Date(c.candle_date_time_kst), p: c.trade_price }));
+  }
+
+  function drawChart(host, pts, dir) {
+    host.textContent = "";
+    if (!pts || pts.length < 2) { host.innerHTML = '<div class="msg">그릴 자료가 모자랍니다.</div>'; return; }
+
+    // 눈금 숫자는 한국식으로 짧게 (177,024,000 → 1.77억)
+    const shortWon = (n) => {
+      if (n >= 1e8) return (n / 1e8).toFixed(2) + "억";
+      if (n >= 1e4) return Math.round(n / 1e4).toLocaleString("ko-KR") + "만";
+      if (n >= 100) return Math.round(n).toLocaleString("ko-KR");
+      return n >= 1 ? n.toFixed(1) : n.toFixed(4);
+    };
+
+    const W = 1000, H = 300, L = 62, R = 16, T = 18, B = 30;
+    const lo = Math.min(...pts.map(p => p.p)), hi = Math.max(...pts.map(p => p.p));
+    const span = (hi - lo) || 1;
+    const x = (i) => L + (W - L - R) * (i / (pts.length - 1));
+    const y = (v) => T + (H - T - B) * (1 - (v - lo) / span);
+    const col = dir >= 0 ? "var(--up)" : "var(--down)";
+
+    const line = pts.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.p).toFixed(1)).join(" ");
+    const area = line + " L" + x(pts.length - 1).toFixed(1) + " " + (H - B) + " L" + L + " " + (H - B) + " Z";
+
+    // 가로 눈금 5개
+    let grid = "", ylab = "";
+    for (let k = 0; k <= 4; k++) {
+      const v = lo + span * (k / 4), yy = y(v).toFixed(1);
+      grid += '<line class="gridline" x1="' + L + '" y1="' + yy + '" x2="' + (W - R) + '" y2="' + yy + '"></line>';
+      ylab += '<text class="axtext" x="' + (L - 8) + '" y="' + (+yy + 4) + '" text-anchor="end">' + shortWon(v) + '</text>';
+    }
+    // 날짜 눈금 3개
+    const dstr = (d) => (d.getFullYear() + "").slice(2) + "." + String(d.getMonth() + 1).padStart(2, "0")
+      + (pts.length <= 31 ? "." + String(d.getDate()).padStart(2, "0") : "");
+    let xlab = "";
+    for (const k of [0, Math.floor((pts.length - 1) / 2), pts.length - 1]) {
+      xlab += '<text class="axtext" x="' + x(k).toFixed(1) + '" y="' + (H - 10)
+        + '" text-anchor="' + (k === 0 ? "start" : k === pts.length - 1 ? "end" : "middle") + '">'
+        + dstr(pts[k].t) + '</text>';
+    }
+
+    // preserveAspectRatio 를 두지 않아야 글자가 늘어나지 않는다
+    host.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" '
+      + 'aria-label="기간별 시세 그래프">' + grid
+      + '<path d="' + area + '" fill="' + col + '" opacity="0.12"></path>'
+      + '<path d="' + line + '" fill="none" stroke="' + col + '" stroke-width="2" '
+      + 'stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>'
+      + ylab + xlab
+      + '<line class="cross" id="crossL" x1="0" y1="' + T + '" x2="0" y2="' + (H - B) + '" style="display:none"></line>'
+      + '<circle id="crossD" r="4" fill="' + col + '" style="display:none"></circle>'
+      + '</svg><div class="tip" id="tip" style="display:none"></div>';
+
+    // 마우스를 올리면 그 날짜의 값을 보여준다
+    const svg = host.querySelector("svg"), tip = host.querySelector("#tip");
+    const cl = host.querySelector("#crossL"), cd = host.querySelector("#crossD");
+    const move = (ev) => {
+      const box = svg.getBoundingClientRect();
+      // 그림이 가운데 맞춰 축소되므로 그 배율과 여백을 반영해야 한다
+      const s = Math.min(box.width / W, box.height / H);
+      const offX = (box.width - W * s) / 2, offY = (box.height - H * s) / 2;
+      const px = ((ev.clientX - box.left) - offX) / s;
+      let i = Math.round((px - L) / ((W - L - R) / (pts.length - 1)));
+      i = Math.max(0, Math.min(pts.length - 1, i));
+      const p = pts[i];
+      cl.style.display = ""; cd.style.display = "";
+      cl.setAttribute("x1", x(i)); cl.setAttribute("x2", x(i));
+      cd.setAttribute("cx", x(i)); cd.setAttribute("cy", y(p.p));
+      tip.style.display = "";
+      tip.style.left = (offX + x(i) * s) + "px";
+      tip.style.top = (offY + y(p.p) * s) + "px";
+      tip.innerHTML = "<b>" + won(p.p) + "원</b>"
+        + p.t.getFullYear() + "년 " + (p.t.getMonth() + 1) + "월 " + p.t.getDate() + "일";
+    };
+    const leave = () => { cl.style.display = "none"; cd.style.display = "none"; tip.style.display = "none"; };
+    svg.addEventListener("mousemove", move);
+    svg.addEventListener("mouseleave", leave);
+    svg.addEventListener("touchmove", (e) => { if (e.touches[0]) move(e.touches[0]); }, { passive: true });
+    svg.addEventListener("touchend", leave);
+  }
+
+  async function openDetail(id, period) {
+    const c = data.get(id);
+    if (!c) return;
+    openId = id; openPeriod = period || openPeriod;
+
+    $("detail").hidden = false;
+    $("dImg").src = c.image;
+    $("dName").textContent = koName(c);
+    $("dSym").textContent = c.symbol.toUpperCase();
+    drawPeriodButtons();
+    $("dChart").innerHTML = '<div class="msg">그래프를 불러오는 중입니다…</div>';
+    $("dStats").textContent = "";
+    $("dNote").textContent = "";
+    $("detail").scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const per = PERIODS.find(p => p.id === openPeriod);
+    try {
+      const pts = await fetchCandles(c.symbol, per);
+      const first = pts[0].p, last = pts[pts.length - 1].p;
+      const chg = (last - first) / first * 100;
+      const dir = chg >= 0 ? 1 : -1;
+      const hi = Math.max(...pts.map(p => p.p)), lo = Math.min(...pts.map(p => p.p));
+
+      drawChart($("dChart"), pts, dir);
+      $("dStats").innerHTML =
+        '<div class="dstat"><div class="k">' + per.ko + ' 등락</div><div class="v ' + (dir > 0 ? "up" : "down") + '">'
+        + (dir > 0 ? "▲ " : "▼ ") + pct(chg) + '</div></div>'
+        + '<div class="dstat"><div class="k">' + per.ko + ' 최고</div><div class="v">' + won(hi) + '원</div></div>'
+        + '<div class="dstat"><div class="k">' + per.ko + ' 최저</div><div class="v">' + won(lo) + '원</div></div>'
+        + '<div class="dstat"><div class="k">지금 가격</div><div class="v">' + won(c.current_price) + '원</div></div>';
+      $("dNote").textContent = "업비트 원화 시세 · " + pts[0].t.toISOString().slice(0,10)
+        + " ~ " + pts[pts.length-1].t.toISOString().slice(0,10)
+        + " · " + pts.length + "개 " + (per.unit === "weeks" ? "주" : "일") + "간 자료"
+        + " · 그래프에 마우스를 올리면 그 날의 값이 나옵니다";
+    } catch (e) {
+      const why = String(e.message || "");
+      $("dChart").innerHTML = '<div class="msg">'
+        + (why === "no_upbit"
+            ? "이 코인은 업비트 원화 시장에 없어서<br>기간별 그래프를 보여드릴 수 없습니다."
+            : why === "busy"
+              ? "시세 서버가 붐빕니다.<br>잠시 뒤 다시 눌러주세요."
+              : "그래프를 가져오지 못했습니다.<br>잠시 뒤 다시 눌러주세요.")
+        + '</div>';
+    }
+  }
+
+  function drawPeriodButtons() {
+    const host = $("periods");
+    host.textContent = "";
+    for (const p of PERIODS) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = p.ko;
+      b.setAttribute("aria-pressed", String(p.id === openPeriod));
+      b.addEventListener("click", () => openDetail(openId, p.id));
+      host.appendChild(b);
+    }
+  }
+
   // ── 카드 그리기 ────────────────────────────────────────
   function card(c) {
     const chg = c.price_change_percentage_24h;
@@ -301,7 +525,7 @@ footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
     el.innerHTML =
       '<div class="coin-h">'
       + '<img src="' + c.image + '" alt="" loading="lazy">'
-      + '<div class="nm"><div class="ko">' + (KO[c.id] || c.name) + '</div>'
+      + '<div class="nm"><div class="ko">' + koName(c) + '</div>'
       + '<div class="sym">' + c.symbol.toUpperCase() + '</div></div>'
       + (c.market_cap_rank ? '<span class="rank">#' + c.market_cap_rank + '</span>' : '')
       + '<button class="del" title="시세판에서 빼기" aria-label="빼기">×</button>'
@@ -311,13 +535,17 @@ footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
       + pct(chg) + '<span class="lbl">24시간 ' + word + '</span></div>'
       + '<div class="spark">' + sparkSVG(c.sparkline_in_7d && c.sparkline_in_7d.price, dir) + '</div>'
       + '<div class="range"><span>24시간 최저 <b>' + won(c.low_24h) + '원</b></span>'
-      + '<span>최고 <b>' + won(c.high_24h) + '원</b></span></div>';
+      + '<span>최고 <b>' + won(c.high_24h) + '원</b></span></div>'
+      + '<span class="open">눌러서 기간별 그래프 보기 →</span>';
 
-    el.querySelector(".del").addEventListener("click", () => {
+    el.querySelector(".del").addEventListener("click", (e) => {
+      e.stopPropagation();
       list = list.filter(x => x !== c.id);
       data.delete(c.id); prevPrice.delete(c.id);
+      if (openId === c.id) { openId = null; $("detail").hidden = true; }
       save(); render(); drawPresets();
     });
+    el.addEventListener("click", () => openDetail(c.id));
     return el;
   }
 
@@ -337,7 +565,7 @@ footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
     const best = rows.slice().sort((a,b) =>
       (b.price_change_percentage_24h ?? -999) - (a.price_change_percentage_24h ?? -999))[0];
     $("sumBest").textContent = best
-      ? (KO[best.id] || best.name) + " " + pct(best.price_change_percentage_24h) : "—";
+      ? koName(best) + " " + pct(best.price_change_percentage_24h) : "—";
     $("sumBest").className = "v " + (best && best.price_change_percentage_24h > 0 ? "up"
       : best && best.price_change_percentage_24h < 0 ? "down" : "");
   }
@@ -465,10 +693,13 @@ footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
     else $("tick").textContent = "꺼짐";
   });
 
+  $("dClose").addEventListener("click", () => { $("detail").hidden = true; openId = null; });
+
   // ── 시작 ─────────────────────────────────────────────
   drawPresets();
   render();
   load();
+  loadUpbitMarkets();
   tickStart();
 })();
 </script>
