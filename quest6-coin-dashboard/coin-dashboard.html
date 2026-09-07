@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>내 코인 시세판</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@300;400;500;700&family=Roboto+Mono:wght@400;500;700&display=swap">
+
+<style>
+:root{
+  --board:#F1F3F6;
+  --panel:#FFFFFF;
+  --panel-2:#E8EBF0;
+  --ink:#131720;
+  --ink-2:#4B5563;
+  --ink-3:#7A8494;
+  --line:#DDE2E9;
+  --line-2:#C3CAD5;
+
+  --up:#15803D;            /* 오름 — 반드시 ▲ 기호와 함께 */
+  --up-soft:#DFF3E6;
+  --down:#DC2626;          /* 내림 — 반드시 ▼ 기호와 함께 */
+  --down-soft:#FBE4E4;
+  --flat:#6B7280;
+  --amber:#A16207;
+  --amber-soft:#FBF1D9;
+
+  --shadow:0 1px 2px rgba(19,23,32,.05), 0 10px 26px -20px rgba(19,23,32,.45);
+
+  --f-disp:"Black Han Sans","Malgun Gothic",sans-serif;
+  --f-body:"Noto Sans KR","Malgun Gothic",sans-serif;
+  --f-num:"Roboto Mono","Consolas",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --board:#0F1216; --panel:#171C22; --panel-2:#1E242C;
+    --ink:#E6EAF0; --ink-2:#9AA5B4; --ink-3:#6B7688;
+    --line:#262D36; --line-2:#39424E;
+    --up:#34D399; --up-soft:#122B22;
+    --down:#F87171; --down-soft:#2C1618;
+    --flat:#8A94A6;
+    --amber:#F0B429; --amber-soft:#2A2213;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -20px rgba(0,0,0,.95);
+  }
+}
+:root[data-theme="dark"]{
+  --board:#0F1216; --panel:#171C22; --panel-2:#1E242C;
+  --ink:#E6EAF0; --ink-2:#9AA5B4; --ink-3:#6B7688;
+  --line:#262D36; --line-2:#39424E;
+  --up:#34D399; --up-soft:#122B22;
+  --down:#F87171; --down-soft:#2C1618;
+  --flat:#8A94A6;
+  --amber:#F0B429; --amber-soft:#2A2213;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 10px 26px -20px rgba(0,0,0,.95);
+}
+
+*{box-sizing:border-box}
+body{background:var(--board);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1200px;margin:0 auto;padding:26px 20px 60px}
+
+/* 머리 */
+header.top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between;
+  padding-bottom:16px;border-bottom:2px solid var(--line-2)}
+h1{font-family:var(--f-disp);font-size:clamp(26px,3.6vw,38px);margin:0;letter-spacing:.01em;line-height:1.1}
+h1 .dot{color:var(--amber)}
+.sub{margin:6px 0 0;color:var(--ink-2);font-size:14px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+button{font-family:var(--f-body);font-size:14.5px;cursor:pointer;border-radius:4px;
+  border:1px solid var(--line-2);background:var(--panel);color:var(--ink);padding:9px 16px;transition:background .12s}
+button:hover{background:var(--panel-2)}
+button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+button.go{background:var(--amber);border-color:var(--amber);color:#1A1508;font-weight:700}
+button.go:hover{filter:brightness(1.08)}
+button.go:disabled{opacity:.55;cursor:not-allowed;filter:none}
+button.small{font-size:13px;padding:6px 11px}
+
+.auto{display:flex;align-items:center;gap:9px;background:var(--panel);border:1px solid var(--line);
+  padding:8px 14px;border-radius:4px;font-size:14px;color:var(--ink-2)}
+.auto input{width:17px;height:17px;accent-color:var(--amber);cursor:pointer}
+.auto .tick{font-family:var(--f-num);font-size:13px;color:var(--amber);font-weight:700;min-width:34px;text-align:right}
+
+/* 요약 줄 */
+.summary{display:flex;flex-wrap:wrap;gap:1px;background:var(--line);border:1px solid var(--line);margin-top:22px}
+.sum{background:var(--panel);padding:14px 20px;flex:1;min-width:130px}
+.sum .k{font-size:12px;color:var(--ink-3);letter-spacing:.04em}
+.sum .v{font-family:var(--f-num);font-size:22px;font-weight:700;line-height:1.3;margin-top:2px}
+.sum .v.up{color:var(--up)} .sum .v.down{color:var(--down)}
+.sum .v small{font-family:var(--f-body);font-size:13px;font-weight:400;color:var(--ink-3);margin-left:4px}
+
+/* 상태 줄 */
+.statusbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:14px;
+  font-size:13.5px;color:var(--ink-3);font-family:var(--f-num)}
+.statusbar .err{color:var(--down);font-family:var(--f-body)}
+.live{display:inline-flex;align-items:center;gap:7px}
+.live i{width:8px;height:8px;border-radius:50%;background:var(--up);display:block;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* 코인 카드 */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;margin-top:22px}
+.coin{background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);
+  padding:18px 18px 14px;position:relative;overflow:hidden}
+.coin::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--flat)}
+.coin.up::before{background:var(--up)}
+.coin.down::before{background:var(--down)}
+.coin.flash-up{animation:flashUp .9s ease-out}
+.coin.flash-down{animation:flashDown .9s ease-out}
+@keyframes flashUp{0%{background:var(--up-soft)}100%{background:var(--panel)}}
+@keyframes flashDown{0%{background:var(--down-soft)}100%{background:var(--panel)}}
+
+.coin-h{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.coin-h img{width:32px;height:32px;border-radius:50%;flex:none;background:var(--panel-2)}
+.coin-h .nm{min-width:0;flex:1}
+.coin-h .ko{font-size:16px;font-weight:700;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.coin-h .sym{font-family:var(--f-num);font-size:11.5px;color:var(--ink-3);letter-spacing:.06em}
+.coin-h .rank{font-family:var(--f-num);font-size:10.5px;color:var(--ink-3);background:var(--panel-2);
+  padding:2px 6px;border-radius:3px;flex:none}
+.coin-h .del{background:transparent;border:none;color:var(--ink-3);font-size:18px;line-height:1;
+  padding:3px 6px;cursor:pointer;border-radius:3px;flex:none}
+.coin-h .del:hover{background:var(--down-soft);color:var(--down)}
+
+.price{font-family:var(--f-num);font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.2;
+  font-variant-numeric:tabular-nums}
+.price .won{font-size:16px;color:var(--ink-3);font-weight:400;margin-left:3px}
+
+.chg{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-family:var(--f-num);
+  font-size:15px;font-weight:700;padding:3px 10px;border-radius:4px}
+.chg.up{color:var(--up);background:var(--up-soft)}
+.chg.down{color:var(--down);background:var(--down-soft)}
+.chg.flat{color:var(--flat);background:var(--panel-2)}
+.chg .arrow{font-size:12px}
+.chg .lbl{font-family:var(--f-body);font-size:12px;font-weight:500;opacity:.85}
+
+.spark{margin-top:14px;height:46px}
+.spark svg{display:block;width:100%;height:46px;overflow:visible}
+
+.range{display:flex;justify-content:space-between;gap:10px;margin-top:12px;padding-top:11px;
+  border-top:1px solid var(--line);font-family:var(--f-num);font-size:11.5px;color:var(--ink-3)}
+.range b{color:var(--ink-2);font-weight:500}
+
+/* 코인 추가 */
+.add{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:20px;margin-top:26px}
+.add h2{font-size:15px;font-weight:700;margin:0 0 4px}
+.add .hint{font-size:13.5px;color:var(--ink-3);margin:0 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{font-size:13.5px;padding:7px 13px;border-radius:999px;background:var(--panel-2);
+  border:1px solid var(--line);color:var(--ink-2);cursor:pointer}
+.chip:hover{border-color:var(--amber);color:var(--ink)}
+.chip:disabled{opacity:.4;cursor:not-allowed}
+.searchrow{display:flex;gap:9px;flex-wrap:wrap}
+.searchrow input{flex:1;min-width:200px;background:var(--panel-2);color:var(--ink);border:1px solid var(--line-2);
+  padding:10px 13px;font-family:var(--f-body);font-size:15px;border-radius:4px}
+.searchrow input:focus{outline:2px solid var(--amber);outline-offset:1px}
+.results{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.results:empty{display:none}
+.res{display:inline-flex;align-items:center;gap:7px;font-size:13.5px;padding:6px 12px;border-radius:4px;
+  background:var(--amber-soft);border:1px solid var(--amber);color:var(--ink);cursor:pointer}
+.res img{width:18px;height:18px;border-radius:50%}
+
+.empty{text-align:center;color:var(--ink-3);padding:52px 20px;border:1px dashed var(--line-2);
+  background:var(--panel);border-radius:6px;margin-top:22px}
+
+footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
+  font-family:var(--f-num);font-size:11px;color:var(--ink-3);line-height:1.9}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:560px){.controls{width:100%}.controls button,.auto{flex:1}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>내 코인 시세판<span class="dot">.</span></h1>
+      <p class="sub">CoinGecko에서 실시간 시세를 가져옵니다. 열쇠(API 키) 없이 무료로 씁니다.</p>
+    </div>
+    <div class="controls">
+      <label class="auto">
+        <input type="checkbox" id="autoOn" checked>
+        자동 갱신
+        <span class="tick" id="tick">30초</span>
+      </label>
+      <button class="go" id="refresh">지금 새로고침</button>
+    </div>
+  </header>
+
+  <div class="summary" id="summary">
+    <div class="sum"><div class="k">담은 코인</div><div class="v" id="sumCount">—</div></div>
+    <div class="sum"><div class="k">24시간 오름</div><div class="v up" id="sumUp">—<small>개</small></div></div>
+    <div class="sum"><div class="k">24시간 내림</div><div class="v down" id="sumDown">—<small>개</small></div></div>
+    <div class="sum"><div class="k">가장 많이 오른 코인</div><div class="v" id="sumBest" style="font-size:17px">—</div></div>
+  </div>
+
+  <div class="statusbar">
+    <span class="live" id="liveDot" hidden><i></i>실시간</span>
+    <span id="lastAt">아직 불러오지 않았습니다</span>
+    <span id="errMsg" class="err"></span>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>담은 코인이 없습니다. 아래에서 코인을 골라 담아보세요.</div>
+
+  <section class="add">
+    <h2>코인 담기</h2>
+    <p class="hint">아래 단추를 누르면 바로 담깁니다. 없는 코인은 <b>영어 이름</b>으로 찾아보세요 (예: solana, chainlink).</p>
+    <div class="chips" id="presetChips"></div>
+    <div class="searchrow">
+      <input id="q" type="text" placeholder="영어 코인 이름이나 기호를 적으세요  (예: sui, avalanche, LINK)" autocomplete="off">
+      <button id="searchBtn">찾기</button>
+    </div>
+    <div class="results" id="results"></div>
+  </section>
+
+  <footer>
+    <div>퀘스트 6 · 실시간 코인 시세 대시보드 — CoinGecko API · 30초 자동 갱신 · 오름 초록 / 내림 빨강</div>
+    <div>시세 출처 api.coingecko.com · 담은 코인 목록은 이 브라우저에만 저장됩니다 · 투자 판단의 근거로 쓰지 마세요</div>
+  </footer>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const LS = "coinboard.list.v1";
+  const REFRESH_SEC = 30;
+
+  // ── 한글 이름표 (CoinGecko는 영어 이름만 준다) ─────────────
+  const KO = {
+    bitcoin:"비트코인", ethereum:"이더리움", ripple:"리플", tether:"테더",
+    binancecoin:"바이낸스코인", solana:"솔라나", "usd-coin":"USD코인", dogecoin:"도지코인",
+    cardano:"에이다", tron:"트론", chainlink:"체인링크", "avalanche-2":"아발란체",
+    polkadot:"폴카닷", "polygon-ecosystem-token":"폴리곤", litecoin:"라이트코인",
+    "shiba-inu":"시바이누", "bitcoin-cash":"비트코인캐시", stellar:"스텔라루멘",
+    uniswap:"유니스왑", cosmos:"코스모스", "hedera-hashgraph":"헤데라", aptos:"앱토스",
+    near:"니어프로토콜", filecoin:"파일코인", arbitrum:"아비트럼", optimism:"옵티미즘",
+    sui:"수이", "render-token":"렌더토큰", "injective-protocol":"인젝티브", kaspa:"카스파",
+    "the-open-network":"톤코인", pepe:"페페", "internet-computer":"인터넷컴퓨터"
+  };
+  const PRESET = ["bitcoin","ethereum","ripple","solana","dogecoin","cardano",
+                  "tron","chainlink","avalanche-2","polkadot","litecoin","the-open-network"];
+
+  let list = (() => {
+    try { const v = JSON.parse(localStorage.getItem(LS)); return Array.isArray(v) && v.length ? v : null; }
+    catch { return null; }
+  })() || ["bitcoin","ethereum","ripple","solana","dogecoin","cardano"];
+
+  const save = () => { try { localStorage.setItem(LS, JSON.stringify(list)); } catch {} };
+
+  let data = new Map();        // id → 코인 정보
+  let prevPrice = new Map();   // id → 직전 가격 (반짝임 판단용)
+  let timer = null, countdown = REFRESH_SEC, loading = false;
+
+  // ── 숫자 다듬기 ────────────────────────────────────────
+  const won = (n) => {
+    if (n == null) return "—";
+    if (n >= 1000) return Math.round(n).toLocaleString("ko-KR");
+    if (n >= 1) return n.toFixed(2);
+    if (n >= 0.01) return n.toFixed(4);
+    return n.toFixed(8);
+  };
+  const pct = (n) => (n == null ? "—" : (n >= 0 ? "+" : "") + n.toFixed(2) + "%");
+  const hhmmss = (d) => [d.getHours(), d.getMinutes(), d.getSeconds()]
+    .map(x => String(x).padStart(2,"0")).join(":");
+
+  // ── 7일 스파크라인 ─────────────────────────────────────
+  function sparkSVG(points, dir) {
+    if (!points || points.length < 2) return "";
+    const w = 260, h = 46, pad = 3;
+    const lo = Math.min(...points), hi = Math.max(...points);
+    const span = (hi - lo) || 1;
+    const step = w / (points.length - 1);
+    const xy = points.map((p, i) => [i * step, pad + (h - pad*2) * (1 - (p - lo) / span)]);
+    const line = xy.map(([x,y], i) => (i ? "L" : "M") + x.toFixed(1) + " " + y.toFixed(1)).join(" ");
+    const area = line + " L" + w + " " + h + " L0 " + h + " Z";
+    const col = dir > 0 ? "var(--up)" : dir < 0 ? "var(--down)" : "var(--flat)";
+    const [ex, ey] = xy[xy.length - 1];
+    return '<svg viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" aria-hidden="true">'
+      + '<path d="' + area + '" fill="' + col + '" opacity="0.10"></path>'
+      + '<path d="' + line + '" fill="none" stroke="' + col + '" stroke-width="2" '
+      + 'stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"></path>'
+      + '<circle cx="' + ex.toFixed(1) + '" cy="' + ey.toFixed(1) + '" r="3" fill="' + col + '"></circle>'
+      + '</svg>';
+  }
+
+  // ── 카드 그리기 ────────────────────────────────────────
+  function card(c) {
+    const chg = c.price_change_percentage_24h;
+    const dir = chg > 0 ? 1 : chg < 0 ? -1 : 0;
+    const cls = dir > 0 ? "up" : dir < 0 ? "down" : "flat";
+    const arrow = dir > 0 ? "▲" : dir < 0 ? "▼" : "―";
+    const word = dir > 0 ? "오름" : dir < 0 ? "내림" : "보합";
+
+    const el = document.createElement("article");
+    el.className = "coin " + cls;
+    el.dataset.id = c.id;
+
+    el.innerHTML =
+      '<div class="coin-h">'
+      + '<img src="' + c.image + '" alt="" loading="lazy">'
+      + '<div class="nm"><div class="ko">' + (KO[c.id] || c.name) + '</div>'
+      + '<div class="sym">' + c.symbol.toUpperCase() + '</div></div>'
+      + (c.market_cap_rank ? '<span class="rank">#' + c.market_cap_rank + '</span>' : '')
+      + '<button class="del" title="시세판에서 빼기" aria-label="빼기">×</button>'
+      + '</div>'
+      + '<div class="price">' + won(c.current_price) + '<span class="won">원</span></div>'
+      + '<div class="chg ' + cls + '"><span class="arrow">' + arrow + '</span>'
+      + pct(chg) + '<span class="lbl">24시간 ' + word + '</span></div>'
+      + '<div class="spark">' + sparkSVG(c.sparkline_in_7d && c.sparkline_in_7d.price, dir) + '</div>'
+      + '<div class="range"><span>24시간 최저 <b>' + won(c.low_24h) + '원</b></span>'
+      + '<span>최고 <b>' + won(c.high_24h) + '원</b></span></div>';
+
+    el.querySelector(".del").addEventListener("click", () => {
+      list = list.filter(x => x !== c.id);
+      data.delete(c.id); prevPrice.delete(c.id);
+      save(); render(); drawPresets();
+    });
+    return el;
+  }
+
+  function render() {
+    const grid = $("grid");
+    grid.textContent = "";
+    const rows = list.map(id => data.get(id)).filter(Boolean);
+    for (const c of rows) grid.appendChild(card(c));
+    $("empty").hidden = list.length > 0;
+
+    // 요약
+    const ups = rows.filter(c => c.price_change_percentage_24h > 0);
+    const downs = rows.filter(c => c.price_change_percentage_24h < 0);
+    $("sumCount").textContent = list.length;
+    $("sumUp").innerHTML = ups.length + '<small>개</small>';
+    $("sumDown").innerHTML = downs.length + '<small>개</small>';
+    const best = rows.slice().sort((a,b) =>
+      (b.price_change_percentage_24h ?? -999) - (a.price_change_percentage_24h ?? -999))[0];
+    $("sumBest").textContent = best
+      ? (KO[best.id] || best.name) + " " + pct(best.price_change_percentage_24h) : "—";
+    $("sumBest").className = "v " + (best && best.price_change_percentage_24h > 0 ? "up"
+      : best && best.price_change_percentage_24h < 0 ? "down" : "");
+  }
+
+  // 가격이 바뀐 카드만 반짝이게
+  function flash(changed) {
+    for (const [id, dir] of changed) {
+      const el = document.querySelector('.coin[data-id="' + id + '"]');
+      if (!el) continue;
+      el.classList.remove("flash-up","flash-down");
+      void el.offsetWidth;                       // 애니메이션 다시 태우기
+      el.classList.add(dir > 0 ? "flash-up" : "flash-down");
+    }
+  }
+
+  // ── 시세 불러오기 ──────────────────────────────────────
+  async function load() {
+    if (loading || !list.length) { if (!list.length) render(); return; }
+    loading = true;
+    $("refresh").disabled = true;
+    $("errMsg").textContent = "";
+
+    const url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=krw"
+      + "&ids=" + encodeURIComponent(list.join(","))
+      + "&order=market_cap_desc&sparkline=true&price_change_percentage=24h";
+
+    try {
+      const r = await fetch(url, { cache: "no-store" });
+      if (r.status === 429) throw new Error("busy");
+      if (!r.ok) throw new Error("http" + r.status);
+      const rows = await r.json();
+
+      const changed = [];
+      for (const c of rows) {
+        const before = prevPrice.get(c.id);
+        if (before != null && before !== c.current_price) {
+          changed.push([c.id, c.current_price > before ? 1 : -1]);
+        }
+        prevPrice.set(c.id, c.current_price);
+        data.set(c.id, c);
+      }
+      render();
+      flash(changed);
+      $("lastAt").textContent = "마지막 갱신 " + hhmmss(new Date());
+      $("liveDot").hidden = false;
+    } catch (e) {
+      const m = String(e.message || "");
+      $("errMsg").textContent = m === "busy"
+        ? "시세 서버가 붐빕니다. 잠시 뒤 다시 시도합니다."
+        : "시세를 가져오지 못했습니다. 인터넷 연결을 확인해 주세요.";
+      $("liveDot").hidden = true;
+    } finally {
+      loading = false;
+      $("refresh").disabled = false;
+      countdown = REFRESH_SEC;
+    }
+  }
+
+  // ── 자동 갱신 시계 ─────────────────────────────────────
+  function tickStart() {
+    clearInterval(timer);
+    timer = setInterval(() => {
+      if (!$("autoOn").checked) { $("tick").textContent = "꺼짐"; return; }
+      countdown -= 1;
+      if (countdown <= 0) { countdown = REFRESH_SEC; load(); }
+      $("tick").textContent = countdown + "초";
+    }, 1000);
+  }
+
+  // ── 코인 담기 단추 ─────────────────────────────────────
+  function drawPresets() {
+    const host = $("presetChips");
+    host.textContent = "";
+    for (const id of PRESET) {
+      const b = document.createElement("button");
+      b.className = "chip";
+      b.type = "button";
+      b.textContent = KO[id] || id;
+      b.disabled = list.includes(id);
+      b.addEventListener("click", () => add(id));
+      host.appendChild(b);
+    }
+  }
+
+  function add(id) {
+    if (list.includes(id)) return;
+    if (list.length >= 20) { $("errMsg").textContent = "한 번에 20개까지만 담을 수 있습니다."; return; }
+    list.push(id); save(); drawPresets(); load();
+  }
+
+  // ── 코인 찾기 ─────────────────────────────────────────
+  async function search() {
+    const q = $("q").value.trim();
+    const box = $("results");
+    box.textContent = "";
+    if (!q) return;
+    $("searchBtn").disabled = true;
+    try {
+      const r = await fetch("https://api.coingecko.com/api/v3/search?query=" + encodeURIComponent(q));
+      if (!r.ok) throw new Error();
+      const coins = ((await r.json()).coins || []).slice(0, 8);
+      if (!coins.length) { box.textContent = "그런 이름의 코인을 못 찾았습니다. 영어로 적어보세요."; return; }
+      for (const c of coins) {
+        const b = document.createElement("button");
+        b.className = "res";
+        b.type = "button";
+        b.innerHTML = (c.thumb ? '<img src="' + c.thumb + '" alt="">' : "")
+          + (KO[c.id] || c.name) + " (" + c.symbol + ")";
+        b.addEventListener("click", () => { add(c.id); box.textContent = ""; $("q").value = ""; });
+        box.appendChild(b);
+      }
+    } catch {
+      box.textContent = "찾는 중에 문제가 생겼습니다. 잠시 뒤 다시 해보세요.";
+    } finally {
+      $("searchBtn").disabled = false;
+    }
+  }
+
+  // ── 이벤트 ────────────────────────────────────────────
+  $("refresh").addEventListener("click", () => { countdown = REFRESH_SEC; load(); });
+  $("searchBtn").addEventListener("click", search);
+  $("q").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); search(); } });
+  $("autoOn").addEventListener("change", (e) => {
+    if (e.target.checked) { countdown = REFRESH_SEC; $("tick").textContent = countdown + "초"; }
+    else $("tick").textContent = "꺼짐";
+  });
+
+  // ── 시작 ─────────────────────────────────────────────
+  drawPresets();
+  render();
+  load();
+  tickStart();
+})();
+</script>
+
+</body>
+</html>

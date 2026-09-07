@@ -14,7 +14,7 @@ last_updated: 2026-09-07
 | 3 | 인스타 벤치마킹 — 필사 계정 분석 → 콘텐츠 기획안 3개 | `quest3-instagram/` | 완료 |
 | 4 | My ChatGPT — 성격을 정해준 AI 사서 채팅창 | `quest4-my-chatgpt/` | 완료 |
 | 5 | My Midjourney — 화풍 8가지를 갖춘 「한 줄 화방」 | `quest5-my-midjourney/` | 완료 |
-| 6 | — | — | 예정 |
+| 6 | 실시간 코인 시세 대시보드 「내 코인 시세판」 | `quest6-coin-dashboard/` | 완료 |
 
 ## 이전에 만든 도구들
 
